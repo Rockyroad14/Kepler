@@ -1,0 +1,43 @@
+import React from "react";
+import {Link} from 'react-router-dom'
+
+const Navbar = () => {
+    
+    const navbarStyle = {
+        backgroundColor: '#333',
+        padding: '10px',
+        color: 'white',
+      };
+    
+      const ulStyle = {
+        listStyleType: 'none',
+        margin: 0,
+        padding: 0,
+        display: 'flex',
+        justifyContent: 'space-around',
+      };
+    
+      const liStyle = {
+        marginRight: '10px',
+      };
+    
+      const linkStyle = {
+        color: 'white',
+        textDecoration: 'none',
+      };
+    
+    return(
+        <nav style={navbarStyle}>
+            <ul style={ulStyle}>
+                <li style={liStyle}>
+                    <Link to='/' style={linkStyle}>Home</Link>
+                </li>
+                <li style={liStyle}>
+                    <Link to="/login" style={linkStyle}>Login</Link>
+                </li>
+            </ul>
+        </nav>
+    );
+};
+
+export default Navbar;
