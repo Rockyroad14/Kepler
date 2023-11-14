@@ -1,20 +1,47 @@
 import React, {useState} from 'react';
 import Navbar from './Navbar';
+import '../LoginPage.css'
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
+    const handleLogin = async (e) => {
+        
+        e.preventDefault();
         // Perform Logic for login
-        console.log("Login Button clicked");
-        console.log('Email:', email);
-        console.log('Password:', password);
-    }
+        try {
+            console.log("Login Button clicked");
+            console.log('Email:', email);
+            console.log('Password:', password);
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password} ),
+            });
+
+            if(response.ok) {
+                // Redirect to the Dashboard 
+                console.log('Login sucessful');
+
+            }
+
+            else {
+                // Handle the error
+                console.error('Login Failed');
+            }   
+
+        }
+
+        catch (error) {
+            console.error('Error occured:', error);
+        }
+    };
 
     return(
         <div>
-            <Navbar />
             <h1>Login Page</h1>
             <form>
                 <label htmlFor='email'>Email:</label>

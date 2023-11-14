@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const app = express();
 const port = 3001;
+const router = express.Router();
 
 //Connecting to Database
 mongoose.connect('mongodb://10.171.25.37:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2');
@@ -20,7 +21,7 @@ db.once('open', () => {
 app.use(cors());
 app.use(express.json());
 
-//Routes
+// Routes
 
 app.get('/api/data', (req, res) => {
 
@@ -28,12 +29,26 @@ app.get('/api/data', (req, res) => {
     res.json(data);
 });
 
-app.get('/api/login', (req, res) => {
+// Login Function
+// Needs to handle Salting and Hashing the password.
+router.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
+
+})
+
+// Creating the User by Admin or Super Admin.
+// Salting and Hashing for added security
+router.post('/api/createuser', async (req, res) => {
+    const { email, password } = req.body;
+
+})
+
+app.get('/api/upload', (req, res) => {
 
 })
 
 // Add more routes, Example above
 
 app.listen(port, () => {
-    console.log('Server is running on http://localhost:${port}');
+    console.log('Server is running on http://localhost:${port}', port);
 });

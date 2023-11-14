@@ -1,13 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import App from './App.jsx'
+import { BrowserRouter, createBrowserRouter } from 'react-router-dom'
 import './index.css'
+import LoginPage from './components/LoginPage.jsx'
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <React.StrictMode>
-      <App />
+      <LoginPage />
     </React.StrictMode>
-  </BrowserRouter>,
+  </BrowserRouter>
 )

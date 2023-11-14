@@ -30,10 +30,13 @@ const Navbar = () => {
         <nav style={navbarStyle}>
             <ul style={ulStyle}>
                 <li style={liStyle}>
-                    <Link to='/' style={linkStyle}>Home</Link>
+                    <Link to='/dashboard' style={linkStyle}>Home</Link>
                 </li>
                 <li style={liStyle}>
-                    <Link to="/login" style={linkStyle}>Login</Link>
+                    <Link to="/team" style={linkStyle}>Team</Link>
+                </li>
+                <li style={liStyle}>
+                    <Link to="/profile" style={linkStyle}>Profile</Link>
                 </li>
             </ul>
         </nav>
