@@ -2,6 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const app = express();
 const port = 3001;
@@ -21,6 +23,18 @@ db.once('open', () => {
 app.use(cors());
 app.use(express.json());
 
+
+// Generating a token to be stored on the client side if credentials are validated
+const generateToken = (userId) => {
+    try {
+        const secretKey = process.env.JWT_SECRET;
+        const token = jwt.sign({ userId }, secretKey, { expiresIn: '1h' })
+        return token;
+    } catch (error) {
+        throw new Error('Error generating token');
+    }
+}
+
 // Routes
 
 app.get('/api/data', (req, res) => {
@@ -33,6 +47,17 @@ app.get('/api/data', (req, res) => {
 // Needs to handle Salting and Hashing the password.
 router.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
+    try {
+
+        if (true) {
+            const userId = user.id;
+            const token = generateToken(userId);
+
+            res.status(200).json({ token });
+        }    
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid credentials' });
+    }
 
 })
 

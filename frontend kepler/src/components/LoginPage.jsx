@@ -19,13 +19,17 @@ const LoginPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password} ),
+                body: JSON.stringify({ email, password }),
             });
 
             if(response.ok) {
                 // Redirect to the Dashboard 
                 console.log('Login sucessful');
+                const { token } = await response.json();
 
+                localStorage.setItem('token', token);
+
+                history.pushState('/dashboard');
             }
 
             else {
