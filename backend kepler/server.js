@@ -4,13 +4,15 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const User = require('./datamodels/user');
 
 const app = express();
 const port = 3001;
 const router = express.Router();
 
-//Connecting to Database
-mongoose.connect('mongodb://10.171.25.37:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.0.2');
+
+//Connecting to Database using Mongoose
+mongoose.connect('mongodb+srv://kepler:juliefsi@kepler.txplc7v.mongodb.net/?retryWrites=true&w=majority');
 
 const db = mongoose.connection;
 
@@ -18,6 +20,7 @@ db.on('error', console.error.bind(console, 'Mongo connection error:'));
 db.once('open', () => {
     console.log('Connected to MongoDB!');
 });
+
 
 //middleware
 app.use(cors());
@@ -37,17 +40,24 @@ const generateToken = (userId) => {
 
 // Routes
 
-app.get('/api/data', (req, res) => {
-
-    const data = { message: 'Hello from the server!'};
-    res.json(data);
-});
 
 // Login Function
 // Needs to handle Salting and Hashing the password.
 router.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password'});
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid email or password'});
+        }
 
         if (true) {
             const userId = user.id;
@@ -68,9 +78,6 @@ router.post('/api/createuser', async (req, res) => {
 
 })
 
-app.get('/api/upload', (req, res) => {
-
-})
 
 // Add more routes, Example above
 

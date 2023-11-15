@@ -2,10 +2,19 @@ const mongoose = require('mongoose');
 
 // Need a way to reference teams
 const userSchema = new mongoose.Schema({
-    uid: Number,
-    name: String,
-    email: String,
-    password: String,
+    name: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    }
 });
 
 // Need a way to reference Users
@@ -19,19 +28,9 @@ const teamSchema = new mongoose.Schema({
 });
 
 
-const programSchema = new mongoose.Schema({
-    pid: Number,
-    statecode: Number,
-    members: {
-        type
-    }
-})
-
 
 const User = mongoose.model('User', userSchema);
 const Team = mongoose.model('Team', teamSchema);
-const Program = mongoose.model('Program', programSchema);
 
-module.exports = Program;
 module.exports = Team;
 module.exports = User;
