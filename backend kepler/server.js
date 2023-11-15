@@ -5,14 +5,16 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const User = require('./datamodels/user');
+const bodyParser = require('body-parser');
 
 const app = express();
-const port = 3001;
-const router = express.Router();
+const port = process.env.PORT;
+const mongoURI = process.env.URI;
 
 
 //Connecting to Database using Mongoose
-mongoose.connect('mongodb+srv://kepler:juliefsi@kepler.txplc7v.mongodb.net/?retryWrites=true&w=majority');
+// Reminder to change the uri to internal databse on head node
+mongoose.connect(mongoURI);
 
 const db = mongoose.connection;
 
@@ -25,6 +27,7 @@ db.once('open', () => {
 //middleware
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json());
 
 
 // Generating a token to be stored on the client side if credentials are validated
@@ -43,11 +46,13 @@ const generateToken = (userId) => {
 
 // Login Function
 // Needs to handle Salting and Hashing the password.
-router.post('/api/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
 
         const user = await User.findOne({ email });
+        console.log(email);
+        console.log(password);
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid email or password'});
@@ -59,12 +64,12 @@ router.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password'});
         }
 
-        if (true) {
-            const userId = user.id;
-            const token = generateToken(userId);
+    
+        const userId = user.id;
+        const token = generateToken(userId);
 
-            res.status(200).json({ token });
-        }    
+        res.status(200).json({ token });
+
     } catch (error) {
         res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -73,14 +78,14 @@ router.post('/api/login', async (req, res) => {
 
 // Creating the User by Admin or Super Admin.
 // Salting and Hashing for added security
-router.post('/api/createuser', async (req, res) => {
-    const { email, password } = req.body;
-
+app.post('/api/createuser', async (req, res) => {
+    const { name ,email, password } = req.body;
+    
 })
 
 
 // Add more routes, Example above
 
 app.listen(port, () => {
-    console.log('Server is running on http://localhost:${port}', port);
+    console.log('Server is running on http://localhost:' + port);
 });
