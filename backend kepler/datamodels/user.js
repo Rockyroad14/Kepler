@@ -14,12 +14,15 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+    },
+    userType: {
+        type: Number,
+        required: true,
     }
 });
 
 // Need a way to reference Users
 const teamSchema = new mongoose.Schema({
-    tid: Number,
     name: String,
     members: {
         type: mongoose.Schema.Types.ObjectId,

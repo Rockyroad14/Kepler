@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT;
 const mongoURI = process.env.URI;
+const saltRounds = 10;
 
 
 //Connecting to Database using Mongoose
@@ -65,7 +66,7 @@ app.post('/api/login', async (req, res) => {
         }
 
     
-        const userId = user.id;
+        const userId = user._id;
         const token = generateToken(userId);
 
         res.status(200).json({ token });
@@ -79,9 +80,29 @@ app.post('/api/login', async (req, res) => {
 // Creating the User by Admin or Super Admin.
 // Salting and Hashing for added security
 app.post('/api/createuser', async (req, res) => {
-    const { name ,email, password } = req.body;
+    const { name, email, password } = req.body;
     
-})
+    try {
+        const existingUser = await User.findOne({ email });
+
+        if (existingUser) {
+            return res.status(400).json({ error: 'User with this email already exists' });
+        }
+
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User({name, email, password: hashedPassword});
+        await newUser.save();
+
+        res.status(201).json({ message: 'User created successfully' });
+
+    } catch (error) {
+        console.error('Error creating user', error);
+        res.status(500).json({ error: 'Error creating user' });
+    }
+
+});
 
 
 // Add more routes, Example above
