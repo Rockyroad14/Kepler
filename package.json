@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "node backend_kepler/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0",
+    "slurm": "^0.5.10"
+  }
+}
