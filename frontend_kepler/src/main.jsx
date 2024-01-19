@@ -3,12 +3,11 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter, createBrowserRouter } from 'react-router-dom'
 import './index.css'
 import LoginPage from './components/LoginPage.jsx'
+import App from './App.jsx'
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
     <React.StrictMode>
-      <LoginPage />
+      <App />
     </React.StrictMode>
-  </BrowserRouter>
 )
