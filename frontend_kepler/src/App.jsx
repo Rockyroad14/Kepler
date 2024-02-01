@@ -10,7 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route  exact path='/' Component={LoginPage} />
-        <Route path='/dashbaord' Component={Dashboard} />
+        <Route path='/dashboard' Component={Dashboard} />
       </Routes>
     </BrowserRouter>
   );

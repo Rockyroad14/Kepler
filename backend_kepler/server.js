@@ -4,13 +4,15 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 const User = require('./datamodels/user');
+const Program = require('./datamodels/program');
 const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT;
 const mongoURI = process.env.URI;
-const saltRounds = 10;
+const saltRounds = parseInt(process.env.SALTROUNDS, 10);
 
 
 //Connecting to Database using Mongoose
@@ -47,6 +49,7 @@ const generateToken = (userId) => {
 
 // Login Function
 // Needs to handle Salting and Hashing the password.
+// Implemented Successfully on 2/1/2024 by Jared Reich
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -56,7 +59,7 @@ app.post('/api/login', async (req, res) => {
         console.log(password);
 
         if (!user) {
-            return res.status(401).json({ message: 'Invalid email or password'});
+            return res.status(401).json({ message: 'Invalid email or password email not found'});
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
@@ -79,8 +82,10 @@ app.post('/api/login', async (req, res) => {
 
 // Creating the User by Admin or Super Admin.
 // Salting and Hashing for added security
+
+// Sucesssfully Implemented 2/1/2024 by Jared Reich
 app.post('/api/createuser', async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, userType } = req.body;
     
     try {
         const existingUser = await User.findOne({ email });
@@ -92,7 +97,7 @@ app.post('/api/createuser', async (req, res) => {
         const salt = await bcrypt.genSalt(saltRounds);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({name, email, password: hashedPassword});
+        const newUser = new User({name, email, password: hashedPassword, userType});
         await newUser.save();
 
         res.status(201).json({ message: 'User created successfully' });
@@ -103,6 +108,8 @@ app.post('/api/createuser', async (req, res) => {
     }
 
 });
+
+
 
 
 // Add more routes, Example above

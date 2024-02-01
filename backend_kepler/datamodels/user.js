@@ -1,39 +1,21 @@
 const mongoose = require('mongoose');
 
-// Need a way to reference teams
+// User schema with associated data with references
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    userType: {
-        type: Number,
-        required: true,
-    }
+    name: { type: String, required: true },
+    
+    email: { type: String, unique: true, required: true, unique: true,},
+    
+    password: { type: String, required: true },
+
+    userType: { type: Number, required: true },
+
+    program: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Program' }, ],
 });
 
-// Need a way to reference Users
-const teamSchema = new mongoose.Schema({
-    name: String,
-    members: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-    },
-});
-
+// Program Schema with associated data needed.
 
 
 const User = mongoose.model('User', userSchema);
-const Team = mongoose.model('Team', teamSchema);
 
-module.exports = Team;
 module.exports = User;

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import Navbar from "./Navbar";
+import DashNavbar from "./DashNavbar";
 
 
 
@@ -25,7 +25,15 @@ export default function DashBoard() {
 
     return(
         <>
-            <Navbar/>
+            <DashNavbar/>
+            <div>
+                <div>
+                    <table>
+                        <caption>Process Queue</caption>
+                        
+                    </table>
+                </div>
+            </div>
         </>
     );
 };
