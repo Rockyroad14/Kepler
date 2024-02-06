@@ -1,9 +1,13 @@
 import React, {useState} from 'react';
 import '../LoginPage.css'
+import { useNavigate } from 'react-router-dom';
+
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigation = useNavigate();
+
 
     const handleLogin = async (e) => {
         
@@ -28,9 +32,8 @@ const LoginPage = () => {
 
                 localStorage.setItem('token', token);
 
-                history.pushState('/dashboard');
+                navigation("/dashboard");
             }
-
             else {
                 // Handle the error
                 console.error('Login Failed');

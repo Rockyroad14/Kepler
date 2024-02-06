@@ -9,7 +9,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route  exact path='/' Component={LoginPage} />
+        <Route path='/' Component={LoginPage} />
         <Route path='/dashboard' Component={Dashboard} />
       </Routes>
     </BrowserRouter>
