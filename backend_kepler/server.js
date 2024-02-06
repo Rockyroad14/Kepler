@@ -198,5 +198,5 @@ app.post('/job-output', (req, res) => {
 
 // Runs on localhost by default, for remote testing change to port, host,
 app.listen(port, () => {
-    console.log('Server is running on '+ host + ":" + port);
+    console.log('Server is running on port ' + port);
 });
