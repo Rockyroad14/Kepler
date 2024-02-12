@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kepler-backend
+  labels:
+    app: kepler-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kepler-backend
+  template:
+    metadata:
+      labels:
+        app: kepler-backend
+    spec:
+      containers:
+      - name: kepler-backend-container
+        image: thomas3212/kepler_backend
+        ports:
+        - containerPort: 3000

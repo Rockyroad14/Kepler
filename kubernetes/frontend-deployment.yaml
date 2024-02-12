@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kepler-frontend
+  labels:
+    app: kepler-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kepler-frontend
+  template:
+    metadata:
+      labels:
+        app: kepler-frontend
+    spec:
+      containers:
+      - name: kepler-frontend-container
+        image: thomas3212/kepler_frontend
+        ports:
+        - containerPort: 5050

@@ -1,0 +1,22 @@
+# will create node environment in container
+FROM node:21-alpine
+
+# makes a directory "app" and switch to that directory
+WORKDIR /app
+
+# copies contents of package.json into the /app directory
+COPY package.json .
+
+# creates node modules in the app
+RUN npm install
+
+# copies source code to /app direcotry
+COPY . .
+
+# exposes port mentioned in vite.config file (default is 5173)
+EXPOSE 5050
+
+
+# executes npm run build to start server
+CMD ["npm", "run", "dev"]
+
