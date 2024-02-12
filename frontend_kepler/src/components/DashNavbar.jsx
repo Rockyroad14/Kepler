@@ -33,7 +33,7 @@ export default function DashNavbar() {
                     <Link to='/dashboard' style={linkStyle}>Home</Link>
                 </li>
                 <li style={liStyle}>
-                    <Link to="/team" style={linkStyle}>Team</Link>
+                    <Link to="/admin" style={linkStyle}>Admin</Link>
                 </li>
                 <li style={liStyle}>
                     <Link to="/profile" style={linkStyle}>Profile</Link>
