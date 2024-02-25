@@ -8,4 +8,11 @@ export default defineConfig({
     host: true,
     port: 5050,
   },
+  test: {
+    globals: true,
+		environment: "jsdom",
+
+    setupFiles: "@testing-library/jest-dom",
+  }
+
 })
