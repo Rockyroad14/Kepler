@@ -1,6 +1,13 @@
 import {React, useState} from 'react';
-import '../LoginPage.css';
 import { useNavigate } from 'react-router-dom';
+import Container from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import Navbar from 'react-bootstrap/Navbar';
+
 
 
 const LoginPage = () => {
@@ -46,31 +53,50 @@ const LoginPage = () => {
         }
     };
 
+    const paddingTopValue = '12%'; // You can use any valid CSS value here
     return(
-        <div>
-            <h1>Login Page</h1>
-            <form>
-                <label htmlFor='email'>Email:</label>
-                <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <br />
-                <label htmlFor='password'>Password:</label>
-                <input
-                    type='password'
-                    id='password'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <br />
-                <button type='button' onClick={handleLogin}>
-                    Login
-                </button>
-            </form>
-        </div>
+        <>
+        <Navbar expand="lg"  className="bg-body-tertiary">
+            <Container>
+                <Navbar.Brand>
+                    <img src="/icons8-planet-emoji-32.png" className="d-inline-block align top"></img>
+                    Kepler Cluster
+                </Navbar.Brand>
+            </Container>
+        </Navbar>
+        <Container fluid  style={{ paddingTop: paddingTopValue }}>
+            <Row/>
+            <Row className="align-items-center">
+                <Col/>
+                <Col>
+                    <Container  style={{ paddingTop: paddingTopValue }}>
+                        <Row>
+                            <Col/>
+                            <Col><h1>Login</h1></Col>
+                            <Col/>
+                        </Row>
+                    </Container>
+                    <Form onSubmit={handleLogin}>
+                        <Form.Group className="mb-3" controlId="formBasicEmail">
+                            <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
+                                <Form.Control type="email" placeholder="name@example.com" onChange={(e) => setEmail(e.target.value)} value={email} />
+                            </FloatingLabel>
+                        </Form.Group>
+                        <Form.Group className="mb-3" controlId="formBasicPassword">
+                            <FloatingLabel controlId="floatingPassword" label="Password">
+                                <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} value={password} />
+                            </FloatingLabel>
+                        </Form.Group>
+                        <div className="d-grid gap-2">
+                            <Button type="submit" size="lg" variant="secondary">Login</Button>
+                        </div>
+                    </Form>
+                </Col>
+                <Col/>
+            </Row>
+            <Row/>
+        </Container>
+        </>
     );
 };
 

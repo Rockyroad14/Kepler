@@ -43,20 +43,20 @@ const generateToken = (userId) => {
 // Dynamically create job scripts based on the users needs
 function generateJobScript(jobName, outputName, errorName, nodes, cpusPerTask, memory, maxTime, containerImage) {
     const script = `#!/bin/bash
-#SBATCH --job-name=${jobName}
-#SBATCH --output=${outputName}.txt
-#SBATCH --error=${errorName}.txt
-#SBATCH --nodes=${nodes}
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=${cpusPerTask}
-#SBATCH --mem=${memory}
-#SBATCH --time=${maxTime}
+    #SBATCH --job-name=${jobName}
+    #SBATCH --output=${outputName}.txt
+    #SBATCH --error=${errorName}.txt
+    #SBATCH --nodes=${nodes}
+    #SBATCH --ntasks-per-node=1
+    #SBATCH --cpus-per-task=${cpusPerTask}
+    #SBATCH --mem=${memory}
+    #SBATCH --time=${maxTime}
 
-# Load the Docker module
-module load docker
+    # Load the Docker module
+    module load docker
 
-# Run the Docker container
-docker run --rm ${containerImage}`;
+    # Run the Docker container
+    docker run --rm ${containerImage}`;
 
     return script;
 }

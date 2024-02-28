@@ -1,9 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import LoginPage from './components/LoginPage'
-import Dashboard from './components/Dashboard'
-import Admin from './components/Admin'
+import LoginPage from './components/LoginPage';
+import Dashboard from './components/Dashboard';
+import Admin from './components/Admin';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
 
 function App() {
