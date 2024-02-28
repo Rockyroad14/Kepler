@@ -38,6 +38,9 @@ export default function DashNavbar() {
                 <li style={liStyle}>
                     <Link to="/profile" style={linkStyle}>Profile</Link>
                 </li>
+                <li style={liStyle}>
+                    <Link to='/' style={linkStyle}>Sign Out</Link>
+                </li>
             </ul>
         </nav>
     );

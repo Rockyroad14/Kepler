@@ -118,6 +118,28 @@ app.post('/api/createuser', async (req, res) => {
 
 });
 
+//upgrade user priveleges to admin
+app.put('/api/users/usertype', async (req, res) => {
+    const userToUpdate = req.body;
+
+    try {
+        const user = await User.findOne({ email: userToUpdate.email});
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+
+        user.userType = 1;
+        await user.save();
+        
+        res.status(200).json({ message: 'User type updated successfully', user });
+    } catch (error) {
+        console.error('Error updating user type', error);
+        res.status(500).json({ error: 'Error updating user type' });
+    }
+});
+
 //gets list of current users
 app.get('/api/users', async (req, res) => {
     try {
@@ -131,10 +153,11 @@ app.get('/api/users', async (req, res) => {
 
 //delete user given an email
 app.delete('/api/users', async (req, res) => {
-    const { email } = req.body;
+    const userToDelete  = req.body;
 
     try {
-        const user = await User.findOneAndDelete({ email });
+        const userEmail = { email: userToDelete.email };
+        const user = await User.findOneAndDelete( userEmail );
 
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
