@@ -7,12 +7,14 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Navbar from 'react-bootstrap/Navbar';
+import Alert from 'react-bootstrap/Alert';
 
 
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
     const navigation = useNavigate();
 
 
@@ -43,6 +45,7 @@ const LoginPage = () => {
             }
             else {
                 // Handle the error
+                setMessage('failed');
                 console.error('Login Failed');
             }   
 
@@ -54,6 +57,7 @@ const LoginPage = () => {
     };
 
     const paddingTopValue = '12%'; // You can use any valid CSS value here
+
     return(
         <>
         <Navbar expand="lg"  className="bg-body-tertiary">
@@ -79,18 +83,19 @@ const LoginPage = () => {
                     <Form onSubmit={handleLogin}>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
-                                <Form.Control type="email" placeholder="name@example.com" onChange={(e) => setEmail(e.target.value)} value={email} />
+                                <Form.Control type="email" placeholder="name@example.com" required onChange={(e) => setEmail(e.target.value)} value={email} />
                             </FloatingLabel>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBasicPassword">
                             <FloatingLabel controlId="floatingPassword" label="Password">
-                                <Form.Control type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} value={password} />
+                                <Form.Control type="password" placeholder="Password" required onChange={(e) => setPassword(e.target.value)} value={password} />
                             </FloatingLabel>
                         </Form.Group>
                         <div className="d-grid gap-2">
                             <Button type="submit" size="lg" variant="secondary">Login</Button>
                         </div>
                     </Form>
+                    {message === 'failed' && <Alert variant='danger' className="mt-3">Login Failed. Please Try Again</Alert>}
                 </Col>
                 <Col/>
             </Row>
