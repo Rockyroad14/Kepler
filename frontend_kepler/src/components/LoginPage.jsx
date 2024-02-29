@@ -39,7 +39,7 @@ const LoginPage = () => {
                 console.log('Login sucessful');
                 const { token } = await response.json();
 
-                localStorage.setItem('token', token);
+                localStorage.setItem('kepler-token', token);
 
                 navigation("/dashboard");
             }
@@ -60,7 +60,7 @@ const LoginPage = () => {
 
     return(
         <>
-        <Navbar expand="lg"  className="bg-body-tertiary">
+        <Navbar expand="lg"  className="bg-body-tertiary" data-bs-theme="dark" sticky="top">
             <Container>
                 <Navbar.Brand>
                     <img src="/icons8-planet-emoji-32.png" className="d-inline-block align top"></img>
