@@ -60,14 +60,16 @@ const LoginPage = () => {
 
     return(
         <>
-        <Navbar expand="lg"  className="bg-body-tertiary" data-bs-theme="dark" sticky="top">
-            <Container>
-                <Navbar.Brand>
-                    <img src="/icons8-planet-emoji-32.png" className="d-inline-block align top"></img>
-                    Kepler Cluster
-                </Navbar.Brand>
-            </Container>
-        </Navbar>
+        <Container>
+            <Navbar expand="lg"  className="bg-body-tertiary" data-bs-theme="dark" fixed="top">
+                <Container className="">
+                    <Navbar.Brand>
+                        <img src="/icons8-planet-emoji-32.png" className="d-inline-block align top"></img>
+                        Kepler Cluster
+                    </Navbar.Brand>
+                </Container>
+            </Navbar>
+        </Container>
         <Container fluid  style={{ paddingTop: paddingTopValue }}>
             <Row/>
             <Row className="align-items-center">

@@ -125,13 +125,7 @@ const Admin = () => {
 
     return (
         <>
-        <DashNavbar/>
         <Container fluid style={{ paddingTop: paddingTopValue }} className="align-items-center"> 
-            <Container  style={{ paddingTop: paddingTopValue }}>
-                <Row className="justify-content-md-center">
-                    <Container className="text-center"><h1>Admin Page</h1></Container>
-                </Row>
-            </Container>
             <Container>
                 <Row>
                     <Container className="text-center"><h2>Create New User</h2></Container>
