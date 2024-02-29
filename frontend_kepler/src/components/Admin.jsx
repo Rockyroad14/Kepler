@@ -128,7 +128,7 @@ const Admin = () => {
         <Container fluid style={{ paddingTop: paddingTopValue }} className="align-items-center"> 
             <Container>
                 <Row>
-                    <Container className="text-center"><h2>Create New User</h2></Container>
+                    <Container className="text-center"><h2><i class="bi bi-person-fill-add"></i> Create New User</h2></Container>
                 </Row>
                 <Row>
                     <Container style={{ paddingTop: paddingTopValue }} className="d-flex justify-content-center align-items-center">
@@ -160,7 +160,7 @@ const Admin = () => {
                                         </label><br/>
                                     </Row>
                                     <Row style={{ paddingTop: "3%" }}>
-                                        <button type="submit" className='align-items-center btn btn-secondary'>Create User</button>
+                                        <button type="submit" className='align-items-center btn btn-secondary'><i class="bi bi-plus"></i> Create User</button>
                                     </Row>
                                 </Form>
                             </Col>
@@ -169,7 +169,7 @@ const Admin = () => {
                 </Row>
             </Container>
             <Container style={{ paddingTop: paddingTopValue }}>
-                    <Container className="text-center"><h2>Manage Users</h2></Container>
+                    <Container className="text-center"><h2><i class="bi bi-person-fill-gear"></i> Manage Users</h2></Container>
                     <Container className="d-flex justify-content-center align-items-center">
                         <Row>
                             <Col md={12}>
@@ -185,8 +185,8 @@ const Admin = () => {
                                         </label><br/>
                                     </Row>
                                     <Row style={{ paddingTop: "3%" }}> 
-                                        <Row><button type="submit" variant="secondary" class="btn btn-secondary" >Upgrade User</button></Row>
-                                        <Row style={{ paddingTop: paddingTopValue }}><button type="button" onClick={handleDeleteUser} class="btn btn-secondary">Delete User</button></Row>
+                                        <Row><button type="submit" variant="secondary" class="btn btn-secondary" ><i class="bi bi-person-fill-up"></i> Upgrade User</button></Row>
+                                        <Row style={{ paddingTop: paddingTopValue }}><button type="button" onClick={handleDeleteUser} class="btn btn-secondary"><i class="bi bi-person-fill-x"></i> Delete User</button></Row>
                                     </Row>
                                 </Form>
                             </Col>

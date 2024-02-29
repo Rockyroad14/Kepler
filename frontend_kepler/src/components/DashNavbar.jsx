@@ -43,11 +43,10 @@ export default function DashNavbar() {
           <Navbar.Collapse className="justify-content-right" variant="blue">
             <Nav className="mr-auto" variant="underline">
               <Link to="/dashboard" className="nav-link">
-                Home
-              </Link>
-              {isAdmin === 1 && (<Nav.Link onClick={handleShowAdmin}>Admin</Nav.Link>)}
-              <Nav.Link onClick={handleShowProfile}>Profile</Nav.Link>
-              <Nav.Link onClick={handleSignOut}>Sign Out</Nav.Link>
+                <i class="bi bi-house-fill"></i> Home</Link>
+              {isAdmin === 1 && (<Nav.Link onClick={handleShowAdmin}><i class="bi bi-database-fill-gear"></i> Admin</Nav.Link>)}
+              <Nav.Link onClick={handleShowProfile}><i class="bi bi-person-circle"></i> Profile</Nav.Link>
+              <Nav.Link onClick={handleSignOut}>Sign Out <i class="bi bi-arrow-bar-right"></i></Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -55,7 +54,7 @@ export default function DashNavbar() {
 
       <Offcanvas show={showAdmin} onHide={handleCloseAdmin} placement="end" data-bs-theme="dark">
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Admin</Offcanvas.Title>
+          <Offcanvas.Title><i class="bi bi-database-fill-gear"></i> Admin</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Admin/>
@@ -64,7 +63,7 @@ export default function DashNavbar() {
 
       <Offcanvas show={showProfile} onHide={handleCloseProfile} placement="end" data-bs-theme="dark">
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Profile</Offcanvas.Title>
+          <Offcanvas.Title><i class="bi bi-person-circle"></i> Profile</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           Add Component Here...
