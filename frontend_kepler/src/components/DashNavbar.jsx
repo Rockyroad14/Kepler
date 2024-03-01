@@ -33,7 +33,7 @@ export default function DashNavbar() {
     
   return(
     <>
-      <Navbar expand="lg"  className="bg-body-tertiary" data-bs-theme="dark" fixed="top">
+      <Navbar expand="lg"  className="bg-body-tertiary" data-bs-theme="dark" sticky="top">
         <Container>
           <Navbar.Brand>
             <img src="/icons8-planet-emoji-32.png" className="d-inline-block align top"></img>
