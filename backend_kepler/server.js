@@ -3,11 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const path = require('path');
+const bcrypt = require('bcryptjs');
 const User = require('./datamodels/user');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
+const { cwd } = require('process');
 const upload = multer({ dest: 'jobs/' });
 require('dotenv').config();
 
@@ -19,9 +21,19 @@ const mongoURI = process.env.URI;
 const saltRounds = parseInt(process.env.SALTROUNDS, 10);
 
 // Middleware for CORS and JSON
-app.use(cors());
+app.use(cors({
+    origin: '*'
+}));
 app.use(express.json());
 app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname, '/../frontend_kepler/dist')));
+
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '/..frontend_kepler/dist', 'index.html'));
+});
+
+
 
 // Mongo database connection and error handler
 mongoose.connect(mongoURI);
@@ -41,22 +53,12 @@ const generateToken = (userId) => {
 }
 
 // Dynamically create job scripts based on the users needs
-function generateJobScript(jobName, outputName, errorName, nodes, cpusPerTask, memory, maxTime, containerImage) {
-    const script = `#!/bin/bash
-    #SBATCH --job-name=${jobName}
-    #SBATCH --output=${outputName}.txt
-    #SBATCH --error=${errorName}.txt
-    #SBATCH --nodes=${nodes}
-    #SBATCH --ntasks-per-node=1
-    #SBATCH --cpus-per-task=${cpusPerTask}
-    #SBATCH --mem=${memory}
-    #SBATCH --time=${maxTime}
+function generateJobScript(jobName, nodes, cpusPerTask, memory, maxTime, scriptName/*, containerImage*/) {
+    const script = `-H -N${nodes} -n${cpusPerTask} --mem-per-cpu=${memory}M -t${maxTime} --qos=test -J ${jobName} ${scriptName}.sh`;
 
-    # Load the Docker module
-    module load docker
-
-    # Run the Docker container
-    docker run --rm ${containerImage}`;
+    console.log(script)
+    // TODO
+    // Modify or create a script to run the docker file
 
     return script;
 }
@@ -171,29 +173,35 @@ app.delete('/api/users', async (req, res) => {
 });
 
 // Endpoint to start a SLURM job based on an uploaded container
-app.post('/submit-job', upload.single('container'),(req, res) => {
+app.post('/submit-job',/* upload.single('container')*/(req, res) => {
     // Get the request body
     const job = req.body;
 
     // Verify a file has been uploaded
-    const containerFile = req.file;
-    if (!containerFile) {
-        return res.status(400).send('No container file uploaded.');
-    }
+   // const containerFile = req.file;
+    //if (!containerFile) {
+        //return res.status(400).send('No container file uploaded.');
+   // }
 
+    
     // Create the job script
-    const jobScript = generateJobScript(job.jobName, job.outputName, job.errorName, job.nodes, job.cpusPerTask, job.memory, job.maxTime, containerFile.destination); 
+    const jobScript = generateJobScript(job.jobName, job.nodes, job.cpusPerTask, job.memory, job.maxTime,job.scriptName/*, containerFile.destination*/); 
+
+    const options = {
+        cwd: '/home/kepler/Kepler/backend_kepler/' // Replace with the desired working directory
+    };
 
     // Run the command on a new thread
-    const submittedJob = spawn(jobScript);
+    const submittedJob = spawn('sudo',['sbatch',jobScript],options);
 
+    submittedJob.stdout.on('data', (data) => {
+        res.send(`Status: ${data}`);
+    });
     // Error handling
     submittedJob.on('exit', (code) => {
-        if (code === 0) {
-            res.send(`Job submitted successfully`);
-        } else {
-            res.status(500).send(`Failed to submit job`);
-        }
+        if (code != 0) {
+            res.status(500).send(`Failed to submit job code ${code}`);
+        } 
     });
 });
 
@@ -202,19 +210,14 @@ app.post('/stop-job', (req, res) => {
     const jobID = req.body.jobID;
     
     // Execute SLURM command to stop the job
-    const stopJobProcess =  spawn('scancel', [jobID]);
-
-    // Monitor the commands output
-    stopJobProcess.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
+    const stopJobProcess =  spawn('sudo', ['scancel', jobID]);
 
     // Error handling
     stopJobProcess.on('exit', (code) => {
         if (code === 0) {
             res.send(`Job ${jobID} stopped successfully`);
         } else {
-            res.status(500).send(`Failed to stop job ${jobID}`);
+            res.status(500).send(`Failed to stop job ${jobID} ${code}`);
         }
     });
 });
@@ -224,12 +227,11 @@ app.post('/check-job', (req, res) => {
     const jobID = req.body.jobID;
 
     // Execute SLURM command to check job status
-    const checkJobProcess = spawn('squeue', ['--job', jobID, '--format=%T']);
+    const checkJobProcess = spawn('sudo', ['squeue','--job', jobID, '--format=%T']);
 
     // Monitor the output and send back the response
     checkJobProcess.stdout.on('data', (data) => {
-        const status = data.toString().trim();
-        res.send(`Job ${jobID} status: ${status}`);
+        res.send(`Job ${jobID} status: ${data}`);
     });
 
     // Handle error
