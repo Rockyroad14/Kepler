@@ -4,7 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const User = require('./datamodels/user');
 const multer = require('multer');
 const bodyParser = require('body-parser');
@@ -66,7 +66,9 @@ function generateJobScript(jobName, nodes, cpusPerTask, memory, maxTime, scriptN
 // Endpoints
 
 // Login Function TODO: handle Salting and Hashing the password. Implemented Successfully on 2/1/2024 by Jared Reich
+// Check to see if reqquest body is JSON web token or has email and password
 app.post('/api/login', async (req, res) => {
+
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });

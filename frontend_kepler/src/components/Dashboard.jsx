@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState} from "react"
 import DashNavbar from "./DashNavbar";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { useNavigate } from 'react-router-dom';
 
 
 
 
 export default function DashBoard() {
+
+    const navigate = useNavigate();
 
     const [file, setFile] = useState(null);
 
@@ -25,6 +28,15 @@ export default function DashBoard() {
 
         }
     }
+
+    // On page load, check for JSON Web Token in local storage with user's credentials, if none, redirect to login page
+    useEffect(() => {
+        const token = localStorage.getItem("kepler-token");
+        if (!token) {
+            navigate("/");
+        }
+    }, []); 
+
 
 
 

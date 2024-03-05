@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import {React, useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -55,6 +55,17 @@ const LoginPage = () => {
             console.error('Error occured:', error);
         }
     };
+
+    // On page load check for Token in local storage, if present, redirect to dashboard
+    useEffect(() => {
+        const token = localStorage.getItem('kepler-token');
+        if (token) {
+            navigation('/dashboard');
+        }
+    }, []);
+
+
+
 
     const paddingTopValue = '12%'; // You can use any valid CSS value here
 

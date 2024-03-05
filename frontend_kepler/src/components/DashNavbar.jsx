@@ -4,11 +4,13 @@ import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import Admin from "./Admin"
+import Admin from "./Admin";
+import { useNavigate } from 'react-router-dom';
 
 
 export default function DashNavbar() {
-    
+  
+  const navigation = useNavigate();
   const [showAdmin, setShowAdmin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isAdmin, setIsAdmin] = useState('');
@@ -28,7 +30,8 @@ export default function DashNavbar() {
   })
 
   const handleSignOut = () => {
-
+    localStorage.removeItem('kepler-token');
+    navigation("/");
   }
     
   return(
