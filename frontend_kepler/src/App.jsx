@@ -11,7 +11,6 @@ function App() {
       <Routes>
         <Route path='/' Component={LoginPage} />
         <Route path='/dashboard' Component={Dashboard} />
-        <Route path='/admin' Component={Admin} />
       </Routes>
     </BrowserRouter>
   );

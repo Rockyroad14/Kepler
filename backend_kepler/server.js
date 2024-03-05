@@ -96,6 +96,25 @@ app.post('/api/login', async (req, res) => {
 
 })
 
+// Token Login Function
+app.post('/api/tokenlogin', async (req, res) => {
+    const { token } = req.body;
+    try {
+        const secretKey = process.env.JWT_SECRET;
+        // Verify the token: Note: jwt.verify does check to see if the token is expired
+        const decoded = jwt.verify(token, secretKey);
+        const userId = decoded.userId;
+        const user = await User.findOne({ _id: userId });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+
+        res.status(200).json({ message: 'Token validated successfully' });
+    } catch (error) {
+        res.status(401).json({ message: 'Internal Server Error' });
+    }
+})
+
 // Creating the User by Admin or Super Admin with Salting and Hashing for added security. Implemented Sucesssfully 2/1/2024 by Jared Reich
 app.post('/api/createuser', async (req, res) => {
     const { name, email, password, userType } = req.body;

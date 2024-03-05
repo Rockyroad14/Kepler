@@ -26,7 +26,7 @@ const LoginPage = () => {
             console.log("Login Button clicked");
             console.log('Email:', email);
             console.log('Password:', password);
-            const response = await fetch('http://localhost:3000/api/login', {
+            const response = await fetch('http://localhost:5050/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -56,12 +56,29 @@ const LoginPage = () => {
         }
     };
 
-    // On page load check for Token in local storage, if present, redirect to dashboard
-    useEffect(() => {
-        const token = localStorage.getItem('kepler-token');
-        if (token) {
-            navigation('/dashboard');
+    const tokenValidation = async () => {
+        const token = localStorage.getItem("kepler-token");
+        const response = await fetch("http://localhost:5050/api/tokenlogin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+        });
+
+        if (response.ok) {
+            console.log("Token validated successfully");
+        } else {
+            console.log("Token validation failed");
+            // Remove token from local storage
+            localStorage.removeItem("kepler-token");
+            navigation("/");
         }
+    }
+
+
+    useEffect(() => {
+        tokenValidation();
     }, []);
 
 
