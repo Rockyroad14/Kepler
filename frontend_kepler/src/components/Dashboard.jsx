@@ -20,7 +20,7 @@ export default function DashBoard() {
     // Token Validation Function
     const tokenValidation = async () => {
         const token = localStorage.getItem("kepler-token");
-        const response = await fetch("http://localhost:5050/api/tokenlogin", {
+        const response = await fetch("http://localhost:3000/api/tokenlogin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

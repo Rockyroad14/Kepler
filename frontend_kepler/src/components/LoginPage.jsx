@@ -26,7 +26,7 @@ const LoginPage = () => {
             console.log("Login Button clicked");
             console.log('Email:', email);
             console.log('Password:', password);
-            const response = await fetch('http://localhost:5050/api/login', {
+            const response = await fetch('http://localhost:3000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const LoginPage = () => {
 
     const tokenValidation = async () => {
         const token = localStorage.getItem("kepler-token");
-        const response = await fetch("http://localhost:5050/api/tokenlogin", {
+        const response = await fetch("http://localhost:3000/api/tokenlogin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
