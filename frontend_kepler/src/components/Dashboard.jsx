@@ -61,15 +61,16 @@ export default function DashBoard() {
             <DashNavbar/>
             <Container className="pt-5">
                 <Row>
-                    <Col>
+                    <Col sm={11}>
+                        <h4>Active Job Queue</h4>
+                    </Col>
+                    <Col className="justify-content-end">
                         <Upload/>
                     </Col>
                 </Row>
-            </Container>
-            <Container className="pt-5">
                 <Row>
                     <Col>
-                        <h2>Active Job Queue</h2>
+
                         <Table className="table-striped">
                             <thead>
                                 <th>Job Name</th>
@@ -90,7 +91,7 @@ export default function DashBoard() {
             <Container className="pt-5">
                 <Row>
                     <Col>
-                        <h2>Inactive Job Queue</h2>
+                        <h4>Staged Jobs</h4>
                         <Table>
                             <thead>
                                 <th>Job Name</th>
@@ -98,6 +99,27 @@ export default function DashBoard() {
                                 <th>Actions</th>
                             </thead>
                             <tbody id="inactiveTable">
+                                <tr>
+                                    <td>Star Sim</td>
+                                    <td>Completed</td>
+                                    <td>Actions Buttons</td>
+                                </tr>
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
+            </Container>
+            <Container className="pt-5">
+                <Row>
+                    <Col>
+                        <h4>Completed Jobs</h4>
+                        <Table>
+                            <thead>
+                                <th>Job Name</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </thead>
+                            <tbody id="completedTable">
                                 <tr>
                                     <td>Star Sim</td>
                                     <td>Completed</td>
