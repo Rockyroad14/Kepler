@@ -5,6 +5,7 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Admin from "./Admin";
+import Profile from "./Profile";
 import { useNavigate } from 'react-router-dom';
 
 
@@ -69,7 +70,7 @@ export default function DashNavbar() {
           <Offcanvas.Title><i class="bi bi-person-circle"></i> Profile</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          Add Component Here...
+          <Profile/>
         </Offcanvas.Body>
       </Offcanvas>
     </>

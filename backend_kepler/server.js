@@ -141,6 +141,39 @@ app.post('/api/createuser', async (req, res) => {
 
 });
 
+//change user password
+app.put('/api/users/password', async (req, res) => {
+    const { password } = req.body;
+    const token = req.headers.authorization.split(' ')[1]; // Assuming 'Bearer <token>' format
+
+    if (!token || !password) {
+        return res.status(400).json({ message: 'Token and password are required.' });
+    }
+
+    let _id;
+    try {
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        _id = decodedToken.userId;
+    } catch (error) {
+        return res.status(401).json({ message: 'Invalid token.' });
+    }
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const user = await User.findByIdAndUpdate(_id, { password: hashedPassword }, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        res.json({ message: 'Password updated successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred while updating the password.' });
+    }
+});
+
 //upgrade user priveleges to admin
 app.put('/api/users/usertype', async (req, res) => {
     const userToUpdate = req.body;
