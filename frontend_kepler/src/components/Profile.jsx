@@ -43,21 +43,23 @@ const Profile = () => {
         <Container>
             <Form onSubmit={handleUpdatePassword}>
                 <Container className="text-center"><h2><i class="bi bi-pencil-square"></i> Change Password</h2></Container>
-                <Form.Group controlId="formNewPassword">
+                <Form.Group controlId="formNewPassword" style={{ paddingTop: "3%" }}>
                     <Form.Label>New Password</Form.Label>
                     <Form.Control type="password" placeholder="Enter new password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
                 </Form.Group>
 
-                <Form.Group controlId="formConfirmPassword">
+                <Form.Group controlId="formConfirmPassword" style={{ paddingTop: "3%" }}>
                     <Form.Label>Confirm New Password</Form.Label>
                     <Form.Control type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
                 </Form.Group>
-
                 {!passwordsMatch && <Alert variant="danger">New passwords do not match!</Alert>}
 
-                <Button variant="primary" type="submit">
-                    Update Password
-                </Button>
+                <Container className="d-flex justify-content-center" style={{ paddingTop: "3%" }}>
+                    <Button variant="primary" type="submit" className='align-items-center btn btn-secondary'>
+                        <i className="bi bi-pencil-square"></i>
+                        Update Password
+                    </Button>
+                </Container>
             </Form>
         </Container>
     );

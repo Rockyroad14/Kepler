@@ -72,8 +72,6 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
-        console.log(email);
-        console.log(password);
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid email or password email not found'});
