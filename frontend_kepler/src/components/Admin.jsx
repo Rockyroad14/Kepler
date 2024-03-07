@@ -176,7 +176,7 @@ const Admin = () => {
                                 <Form onSubmit={handleUpgradeUser}>
                                     <Row style={{ paddingTop: "3%" }}>
                                         <label>
-                                            Select User:
+                                            Select User: {' '}
                                             <select value={selectedUser} onChange={e => setSelectedUser(e.target.value)} required>
                                                 {users.map(user => (
                                                     <option key={user.id} value={user.id}>{user.name}</option>

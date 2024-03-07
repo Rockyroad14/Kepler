@@ -7,6 +7,7 @@ import Col from "react-bootstrap/Col";
 import { useNavigate } from 'react-router-dom';
 import Placeholder from "react-bootstrap/Placeholder";
 import Upload from "./Upload";
+import ProgressBar from "react-bootstrap/ProgressBar";
 
 
 
@@ -38,7 +39,7 @@ export default function DashBoard() {
         }
     }
 
-    // After tokenValidation, load inactive and active job queues into corresponding tables
+    // After tokenValidation, load active, staged, and Completed jobs into corresponding tables
     const loadJobQueues = async () => {
 
     }
@@ -80,7 +81,7 @@ export default function DashBoard() {
                             <tbody id="activeTable">
                                 <tr>
                                     <td>Puppy Sim</td>
-                                    <td>Running...</td>
+                                    <td>Running... <ProgressBar animated now={100} /></td>
                                     <td>Actions Buttons</td>
                                 </tr>
                             </tbody>
@@ -101,7 +102,7 @@ export default function DashBoard() {
                             <tbody id="inactiveTable">
                                 <tr>
                                     <td>Star Sim</td>
-                                    <td>Completed</td>
+                                    <td>Completed <ProgressBar variant="success" now={100} /></td>
                                     <td>Actions Buttons</td>
                                 </tr>
                             </tbody>
