@@ -1,6 +1,6 @@
-import {React, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import Container from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -8,6 +8,8 @@ import Button from 'react-bootstrap/Button';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Navbar from 'react-bootstrap/Navbar';
 import Alert from 'react-bootstrap/Alert';
+import HandleLogin from './HandleLogin';
+import TokenValidation from './TokenValidation';
 
 
 
@@ -18,67 +20,27 @@ const LoginPage = () => {
     const navigation = useNavigate();
 
 
-    const handleLogin = async (e) => {
+    const handleSubmit = async (e) => {
         
         e.preventDefault();
-        // Perform Logic for login
-        try {
-            console.log("Login Button clicked");
-            console.log('Email:', email);
-            console.log('Password:', password);
-            const response = await fetch('http://localhost:3000/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+        
 
-            if(response.ok) {
-                // Redirect to the Dashboard 
-                console.log('Login sucessful');
-                const { token } = await response.json();
 
-                localStorage.setItem('kepler-token', token);
-
-                navigation("/dashboard");
-            }
-            else {
-                // Handle the error
-                setMessage('failed');
-                console.error('Login Failed');
-            }   
-
+        if (await HandleLogin(email, password))
+        {
+            navigation("/dashboard");
         }
-
-        catch (error) {
-            console.error('Error occured:', error);
+        else 
+        {
+            setMessage("failed");
         }
+        
     };
 
-    const tokenValidation = async () => {
-        const token = localStorage.getItem("kepler-token");
-        const response = await fetch("http://localhost:3000/api/tokenlogin", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
-        });
-
-        if (response.ok) {
-            console.log("Token validated successfully");
-        } else {
-            console.log("Token validation failed");
-            // Remove token from local storage
-            localStorage.removeItem("kepler-token");
-            navigation("/");
-        }
-    }
-
+    
 
     useEffect(() => {
-        tokenValidation();
+        TokenValidation(navigation)
     }, []);
 
 
@@ -110,19 +72,31 @@ const LoginPage = () => {
                             <Col/>
                         </Row>
                     </Container>
-                    <Form onSubmit={handleLogin}>
+                    <Form onSubmit={handleSubmit} data-testid='submitForm'>
                         <Form.Group className="mb-3" controlId="formBasicEmail">
                             <FloatingLabel controlId="floatingInput" label="Email address" className="mb-3">
-                                <Form.Control type="email" placeholder="name@example.com" required onChange={(e) => setEmail(e.target.value)} value={email} />
+                                <Form.Control 
+                                    type="email" 
+                                    placeholder="name@example.com" 
+                                    required onChange={(e) => setEmail(e.target.value)} 
+                                    data-testid='email'
+                                    name='email' // for formdata purposes
+                                    value={email} />
                             </FloatingLabel>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="formBasicPassword">
                             <FloatingLabel controlId="floatingPassword" label="Password">
-                                <Form.Control type="password" placeholder="Password" required onChange={(e) => setPassword(e.target.value)} value={password} />
+                                <Form.Control 
+                                    type="password" 
+                                    placeholder="Password" 
+                                    required onChange={(e) => setPassword(e.target.value)} 
+                                    data-testid='password'
+                                    name='password' // for formdata purposes
+                                    value={password} />
                             </FloatingLabel>
                         </Form.Group>
                         <div className="d-grid gap-2">
-                            <Button type="submit" size="lg" variant="secondary">Login</Button>
+                            <Button type="submit" size="lg" variant="secondary" data-testid='submitLogin'>Login</Button>
                         </div>
                     </Form>
                     {message === 'failed' && <Alert variant='danger' className="mt-3">Login Failed. Please Try Again</Alert>}
