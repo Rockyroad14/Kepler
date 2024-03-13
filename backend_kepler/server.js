@@ -6,12 +6,8 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const User = require('./datamodels/user');
-const multer = require('multer');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
-const { cwd } = require('process');
-const upload = multer({ dest: 'jobs/' });
-const fs = require('fs');
 require('dotenv').config();
 
 // Initial variables
@@ -218,20 +214,6 @@ app.delete('/api/users', async (req, res) => {
 app.post('/submit-job',(req, res) => {
     // Get the request body
     const job = req.body;
-
-    // Verify a file has been uploaded
-   // const containerFile = req.file;
-    //if (!containerFile) {
-        //return res.status(400).send('No container file uploaded.');
-   // }
-
-    
-    // Create the job script
-    const jobScript = generateJobScript(job.jobName, job.nodes, job.cpusPerTask, job.memory, job.maxTime,job.scriptName/*, containerFile.destination*/); 
-
-    const options = {
-        cwd: '/home/kepler/Kepler/backend_kepler/' // Replace with the desired working directory
-    };
 
     // Run the command on a new thread
     const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpusPerTask,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/job_output/','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',job.container]);
