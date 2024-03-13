@@ -4,13 +4,14 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const User = require('./datamodels/user');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
 const { cwd } = require('process');
 const upload = multer({ dest: 'jobs/' });
+const fs = require('fs');
 require('dotenv').config();
 
 // Initial variables
@@ -52,21 +53,10 @@ const generateToken = (userId) => {
     }
 }
 
-// Dynamically create job scripts based on the users needs
-function generateJobScript(jobName, nodes, cpusPerTask, memory, maxTime, scriptName/*, containerImage*/) {
-    const script = `-H -N${nodes} -n${cpusPerTask} --mem-per-cpu=${memory}M -t${maxTime} --qos=test -J ${jobName} ${scriptName}.sh`;
-
-    console.log(script)
-    // TODO
-    // Modify or create a script to run the docker file
-
-    return script;
-}
-
 // Endpoints
 
 // Login Function TODO: handle Salting and Hashing the password. Implemented Successfully on 2/1/2024 by Jared Reich
-// Check to see if reqquest body is JSON web token or has email and password
+// Check to see if request body is JSON web token or has email and password
 app.post('/api/login', async (req, res) => {
 
     const { email, password } = req.body;
@@ -225,35 +215,33 @@ app.delete('/api/users', async (req, res) => {
 });
 
 // Endpoint to start a SLURM job based on an uploaded container
-app.post('/submit-job',/* upload.single('container')*/(req, res) => {
+app.post('/submit-job',(req, res) => {
     // Get the request body
     const job = req.body;
-
-    // Verify a file has been uploaded
-   // const containerFile = req.file;
-    //if (!containerFile) {
-        //return res.status(400).send('No container file uploaded.');
-   // }
-
     
-    // Create the job script
-    const jobScript = generateJobScript(job.jobName, job.nodes, job.cpusPerTask, job.memory, job.maxTime,job.scriptName/*, containerFile.destination*/); 
-
-    const options = {
-        cwd: '/home/kepler/Kepler/backend_kepler/' // Replace with the desired working directory
-    };
-
     // Run the command on a new thread
-    const submittedJob = spawn('sudo',['sbatch',jobScript],options);
+    const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpusPerTask,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/job_output/','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',job.container]);
 
+    // Listen for stdout data
     submittedJob.stdout.on('data', (data) => {
-        res.send(`Status: ${data}`);
+        console.log(`stdout: ${data}`);
     });
-    // Error handling
+
+    // Listen for stderr data
+    submittedJob.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    // Listen for process exit
     submittedJob.on('exit', (code) => {
-        if (code != 0) {
-            res.status(500).send(`Failed to submit job code ${code}`);
-        } 
+        console.log(`Child process exited with code ${code}`);
+        res.send(`Job started successfully`);
+    });
+
+    // Listen for process errors
+    submittedJob.on('error', (err) => {
+        console.error('Failed to start subprocess.', err);
+        res.send(`Job failed to start err:`, err);
     });
 });
 
