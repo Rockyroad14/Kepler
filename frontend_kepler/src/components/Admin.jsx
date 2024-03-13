@@ -64,7 +64,7 @@ const Admin = () => {
             return;
         }
     
-        const response = await fetch('http://localhost:3000/api/users/usertype', {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/usertype`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ const Admin = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:3000/api/users', {
+            const response = await fetch(`http://${apiUrl}:${apiPort}/api/users`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const Admin = () => {
 
     const fetchUsers = async () => {
         try {
-          const response = await fetch('http://localhost:3000/api/users');
+          const response = await fetch(`http://${apiUrl}:${apiPort}/api/users`);
           const data = await response.json();
           setUsers(data);
         } catch (error) {
