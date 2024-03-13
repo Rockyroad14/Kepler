@@ -6,6 +6,9 @@ import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 
 
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
+
 
 export default function Upload()
 {
@@ -26,7 +29,7 @@ export default function Upload()
         formData.append('cpus', cpus);
         formData.append('memory', memory);
         formData.append('time', time);
-        const response = await fetch('http://localhost:3000/submit-job', {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/submit-job`, {
             method: 'POST',
             body: formData,
         });

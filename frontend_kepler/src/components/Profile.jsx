@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Alert } from 'react-bootstrap';
 
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
+
 const Profile = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,7 +23,7 @@ const Profile = () => {
             return;
         }
     
-        const response = await fetch('http://localhost:3000/api/users/password', {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/password`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

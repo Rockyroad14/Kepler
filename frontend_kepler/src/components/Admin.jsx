@@ -6,6 +6,9 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
+
 const Admin = () => {
     const [email, setEmail] = useState('');
     const [name, setName] = useState('');
@@ -21,7 +24,7 @@ const Admin = () => {
         const user = { name, email, password, userType}; // userType is set to 'user' as an example
     
         try {
-            const response = await fetch('http://localhost:3000/api/createuser', {
+            const response = await fetch(`http://${apiUrl}:${apiPort}/api/createuser`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

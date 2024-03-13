@@ -9,7 +9,8 @@ import Placeholder from "react-bootstrap/Placeholder";
 import Upload from "./Upload";
 import ProgressBar from "react-bootstrap/ProgressBar";
 
-
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
 
 
 export default function DashBoard() {
@@ -21,7 +22,7 @@ export default function DashBoard() {
     // Token Validation Function
     const tokenValidation = async () => {
         const token = localStorage.getItem("kepler-token");
-        const response = await fetch("http://localhost:3000/api/tokenlogin", {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/tokenlogin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

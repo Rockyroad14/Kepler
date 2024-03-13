@@ -1,3 +1,6 @@
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
+
 
 const HandleLogin = async (email, password) => {
     
@@ -5,7 +8,7 @@ const HandleLogin = async (email, password) => {
         console.log("Login Button clicked");
         console.log('Email:', email);
         console.log('Password:', password);
-        const response = await fetch('http://localhost:3000/api/login', {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

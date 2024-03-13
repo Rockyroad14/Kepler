@@ -72,7 +72,7 @@ app.post('/api/login', async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ message: 'Invalid email or password'});
         }
-    
+
         const userId = user._id;
         const token = generateToken(userId);
 
@@ -106,7 +106,7 @@ app.post('/api/tokenlogin', async (req, res) => {
 // Creating the User by Admin or Super Admin with Salting and Hashing for added security. Implemented Sucesssfully 2/1/2024 by Jared Reich
 app.post('/api/createuser', async (req, res) => {
     const { name, email, password, userType } = req.body;
-    
+
     try {
         const existingUser = await User.findOne({ email });
 
@@ -176,7 +176,7 @@ app.put('/api/users/usertype', async (req, res) => {
 
         user.userType = 1;
         await user.save();
-        
+
         res.status(200).json({ message: 'User type updated successfully', user });
     } catch (error) {
         console.error('Error updating user type', error);
@@ -218,7 +218,21 @@ app.delete('/api/users', async (req, res) => {
 app.post('/submit-job',(req, res) => {
     // Get the request body
     const job = req.body;
+
+    // Verify a file has been uploaded
+   // const containerFile = req.file;
+    //if (!containerFile) {
+        //return res.status(400).send('No container file uploaded.');
+   // }
+
     
+    // Create the job script
+    const jobScript = generateJobScript(job.jobName, job.nodes, job.cpusPerTask, job.memory, job.maxTime,job.scriptName/*, containerFile.destination*/); 
+
+    const options = {
+        cwd: '/home/kepler/Kepler/backend_kepler/' // Replace with the desired working directory
+    };
+
     // Run the command on a new thread
     const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpusPerTask,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/job_output/','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',job.container]);
 
@@ -234,21 +248,16 @@ app.post('/submit-job',(req, res) => {
 
     // Listen for process exit
     submittedJob.on('exit', (code) => {
-        console.log(`Child process exited with code ${code}`);
-        res.send(`Job started successfully`);
-    });
-
-    // Listen for process errors
-    submittedJob.on('error', (err) => {
-        console.error('Failed to start subprocess.', err);
-        res.send(`Job failed to start err:`, err);
+        if (code != 0) {
+            res.status(500).send(`Failed to submit job code ${code}`);
+        } 
     });
 });
 
 // Endpoint to cancel a SLURM job
 app.post('/stop-job', (req, res) => {
     const jobID = req.body.jobID;
-    
+
     // Execute SLURM command to stop the job
     const stopJobProcess =  spawn('sudo', ['scancel', jobID]);
 
