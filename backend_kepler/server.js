@@ -13,7 +13,6 @@ require('dotenv').config();
 // Initial variables
 const app = express();
 const port = process.env.PORT;
-const host = process.env.HOST;
 const mongoURI = process.env.URI;
 const saltRounds = parseInt(process.env.SALTROUNDS, 10);
 
@@ -29,8 +28,6 @@ app.use(express.static(path.join(__dirname, '/../frontend_kepler/dist')));
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, '/..frontend_kepler/dist', 'index.html'));
 });
-
-
 
 // Mongo database connection and error handler
 mongoose.connect(mongoURI);
@@ -51,7 +48,6 @@ const generateToken = (userId) => {
 
 // Endpoints
 
-// Login Function TODO: handle Salting and Hashing the password. Implemented Successfully on 2/1/2024 by Jared Reich
 // Check to see if request body is JSON web token or has email and password
 app.post('/api/login', async (req, res) => {
 
@@ -125,7 +121,7 @@ app.post('/api/createuser', async (req, res) => {
 
 });
 
-//change user password
+// Change user password
 app.put('/api/users/password', async (req, res) => {
     const { password } = req.body;
     const token = req.headers.authorization.split(' ')[1]; // Assuming 'Bearer <token>' format
@@ -158,7 +154,7 @@ app.put('/api/users/password', async (req, res) => {
     }
 });
 
-//upgrade user priveleges to admin
+// Upgrade user priveleges to admin
 app.put('/api/users/usertype', async (req, res) => {
     const userToUpdate = req.body;
 
@@ -180,7 +176,7 @@ app.put('/api/users/usertype', async (req, res) => {
     }
 });
 
-//gets list of current users
+// Gets list of current users
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.find({});
@@ -191,7 +187,7 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-//delete user given an email
+// Delete user given an email
 app.delete('/api/users', async (req, res) => {
     const userToDelete  = req.body;
 
@@ -208,6 +204,11 @@ app.delete('/api/users', async (req, res) => {
         console.error('Error deleting user', error);
         res.status(500).json({ error: 'Error deleting user' });
     }
+});
+
+// Stages container file and variables in the database
+app.post('/upload-job',(req, res) => {
+
 });
 
 // Endpoint to start a SLURM job based on an uploaded container
