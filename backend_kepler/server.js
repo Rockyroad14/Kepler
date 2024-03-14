@@ -187,6 +187,22 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
+
+app.get('/api/users/loadtables' , async (req, res) => {
+    const token = req.body.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+    try {
+        const stagedJobs = await Job.find({userId: userId, status: 'staged'});
+        const activeJobs = await Job.find({userId: userId, status: 'active'});
+        const completedJobs = await Job.find({userId: userId, status: 'completed'});
+    }
+    catch (error) {
+        console.error('Error getting jobs', error);
+        res.status(500).json({ error: 'Error getting jobs' });
+    }
+});
+
 // Delete user given an email
 app.delete('/api/users', async (req, res) => {
     const userToDelete  = req.body;

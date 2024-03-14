@@ -10,7 +10,7 @@ const programSchema = new mongoose.Schema({
 
     container: { type: String, required: true, },
 
-    stateCode: { type: Number, required: true, },
+    stateCode: { type: String, required: true, },
 
     nodes: { type: Number, required: true, },
 

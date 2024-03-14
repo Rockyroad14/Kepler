@@ -43,7 +43,7 @@ export default function DashBoard() {
 
     // After tokenValidation, load active, staged, and Completed jobs into corresponding tables
     const loadJobQueues = async () => {
-        
+
     }
 
 
@@ -105,7 +105,9 @@ export default function DashBoard() {
                                 <tr key={job.id}>
                                     <td>{job.name}</td>
                                     <td>{job.status}</td>
-                                    <td>{job.actions}</td>
+                                    <td>
+                                        
+                                    </td>
                                 </tr>
                             ))
                         )}
