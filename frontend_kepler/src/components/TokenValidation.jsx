@@ -2,7 +2,7 @@
 const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
 const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
 
-const TokenValidation = async (navigation) => {
+const TokenValidation = async () => {
     const token = localStorage.getItem("kepler-token");
     const response = await fetch(`http://${apiUrl}:${apiPort}/api/tokenlogin`, {
         method: "POST",
@@ -14,11 +14,12 @@ const TokenValidation = async (navigation) => {
 
     if (response.ok) {
         console.log("Token validated successfully");
+        return true
     } else {
         console.log("Token validation failed");
         // Remove token from local storage
         localStorage.removeItem("kepler-token");
-        navigation("/");
+        return false
     }
 }
 

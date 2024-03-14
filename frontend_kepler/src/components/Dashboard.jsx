@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import Placeholder from "react-bootstrap/Placeholder";
 import Upload from "./Upload";
 import ProgressBar from "react-bootstrap/ProgressBar";
+import TokenValidation from "./TokenValidation";
 
 const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
 const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
@@ -15,29 +16,15 @@ const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
 
 export default function DashBoard() {
 
-    const navigate = useNavigate();
+    const navigation = useNavigate();
 
     const [file, setFile] = useState(null);
     const [tableData, setTableData] = useState({ activeJobs: [], stagedJobs: [], completedJobs: [] });
 
     // Token Validation Function
-    const tokenValidation = async () => {
-        const token = localStorage.getItem("kepler-token");
-        const response = await fetch(`http://${apiUrl}:${apiPort}/api/tokenlogin`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token }),
-        });
-
-        if (response.ok) {
-            console.log("Token validated successfully");
-        } else {
-            console.log("Token validation failed");
-            // Remove token from local storage
-            localStorage.removeItem("kepler-token");
-            navigate("/");
+    async function validateToken() {
+        if (!(await TokenValidation())) {
+            navigation("/");
         }
     }
 
@@ -51,7 +38,7 @@ export default function DashBoard() {
 
     // On page load, check for JSON Web Token in local storage with user's credentials, if none, redirect to login page
     useEffect(() => {
-        tokenValidation();
+        validateToken()
         loadJobQueues();
     }, []); 
 
