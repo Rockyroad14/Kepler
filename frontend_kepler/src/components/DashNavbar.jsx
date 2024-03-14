@@ -22,7 +22,7 @@ export default function DashNavbar() {
   const handleCloseProfile = () => setShowProfile(false);
 
   const getUserRole = () => {
-    return 1;
+    
   }
 
   useEffect(() => {

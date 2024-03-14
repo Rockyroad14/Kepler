@@ -18,6 +18,7 @@ export default function DashBoard() {
     const navigate = useNavigate();
 
     const [file, setFile] = useState(null);
+    const [tableData, setTableData] = useState({ activeJobs: [], stagedJobs: [], completedJobs: [] });
 
     // Token Validation Function
     const tokenValidation = async () => {
@@ -42,7 +43,7 @@ export default function DashBoard() {
 
     // After tokenValidation, load active, staged, and Completed jobs into corresponding tables
     const loadJobQueues = async () => {
-
+        
     }
 
 
@@ -51,6 +52,7 @@ export default function DashBoard() {
     // On page load, check for JSON Web Token in local storage with user's credentials, if none, redirect to login page
     useEffect(() => {
         tokenValidation();
+        loadJobQueues();
     }, []); 
 
 
@@ -80,11 +82,33 @@ export default function DashBoard() {
                                 <th>Actions</th>
                             </thead>
                             <tbody id="activeTable">
-                                <tr>
-                                    <td>Puppy Sim</td>
-                                    <td>Running... <ProgressBar animated now={100} /></td>
-                                    <td>Actions Buttons</td>
+                            {tableData.activeJobs.length === 0 ? (
+                                <>
+                                    <Placeholder as="tr" animation="glow" bg="dark">
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                    </Placeholder>
+                                    <Placeholder as="tr" animation="glow">
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                    </Placeholder>
+                                    <Placeholder as="tr" animation="glow" bg="dark">
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                    </Placeholder>
+                                </>
+                            ) : (
+                                tableData.activeJobs.map(job => (
+                                <tr key={job.id}>
+                                    <td>{job.name}</td>
+                                    <td>{job.status}</td>
+                                    <td>{job.actions}</td>
                                 </tr>
+                            ))
+                        )}
                             </tbody>
                         </Table>
                     </Col>
@@ -101,11 +125,33 @@ export default function DashBoard() {
                                 <th>Actions</th>
                             </thead>
                             <tbody id="inactiveTable">
-                                <tr>
-                                    <td>Star Sim</td>
-                                    <td>Completed <ProgressBar variant="success" now={100} /></td>
-                                    <td>Actions Buttons</td>
-                                </tr>
+                                {tableData.stagedJobs.length === 0 ? (
+                                    <>
+                                        <Placeholder as="tr" animation="glow" bg="dark">
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        </Placeholder>
+                                        <Placeholder as="tr" animation="glow">
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        </Placeholder>
+                                        <Placeholder as="tr" animation="glow" bg="dark">
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        </Placeholder>
+                                    </>
+                                    ) : (
+                                        tableData.stagedJobs.map(job => (
+                                        <tr key={job.id}>
+                                            <td>{job.name}</td>
+                                            <td>{job.status}</td>
+                                            <td>{job.actions}</td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </Table>
                     </Col>
@@ -122,11 +168,33 @@ export default function DashBoard() {
                                 <th>Actions</th>
                             </thead>
                             <tbody id="completedTable">
-                                <tr>
-                                    <td>Star Sim</td>
-                                    <td>Completed</td>
-                                    <td>Actions Buttons</td>
-                                </tr>
+                                {tableData.completedJobs.length === 0 ? (
+                                    <>
+                                        <Placeholder as="tr" animation="glow" bg="dark">
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        </Placeholder>
+                                        <Placeholder as="tr" animation="glow">
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        </Placeholder>
+                                        <Placeholder as="tr" animation="glow" bg="dark">
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                            <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        </Placeholder>
+                                    </>
+                                    ) : (
+                                        tableData.completedJobs.map(job => (
+                                        <tr key={job.id}>
+                                            <td>{job.name}</td>
+                                            <td>{job.status}</td>
+                                            <td>{job.actions}</td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </Table>
                     </Col>
