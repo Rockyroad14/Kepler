@@ -37,10 +37,17 @@ const LoginPage = () => {
         
     };
 
+    // Token Validation Function
+    async function validateToken() {
+        if ((await TokenValidation())) {
+            navigation("/dashboard");
+        }
+    }
+
     
 
     useEffect(() => {
-        TokenValidation(navigation)
+        validateToken()
     }, []);
 
 
