@@ -1,13 +1,16 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
+import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
+
 
 
 const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
-const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT 
+const numCPUs = import.meta.env.VITE_REACT_APP_NUM_CPUS
 
 
 export default function Upload()
@@ -20,25 +23,71 @@ export default function Upload()
     const [cpus, setCpus] = useState('');
     const [memory, setMemory] = useState('');
     const [time, setTime] = useState('');
+    const [submit, setSubmit] = useState("Submit");
+    const [uploadResponse, setUploadResponse] = useState('');
+
 
     const handleUpload = async (e) => {
         e.preventDefault();
+        setSubmit(<Spinner animation="border" role="status" size="sm" />);
         const formData = new FormData();
         formData.append('file', file);
         formData.append('jobName', jobName);
         formData.append('cpus', cpus);
         formData.append('memory', memory);
         formData.append('time', time);
-        const response = await fetch(`http://${apiUrl}:${apiPort}/submit-job`, {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/stagejob`, {
             method: 'POST',
             body: formData,
+            headers: {
+                'kepler-token': localStorage.getItem('kepler-token')
+            }
         });
+    
+        const data = await response.json();
+
         if(response.ok) {
             console.log('Job submitted successfully');
-        } else {
-            console.error('Error submitting job');
+            setUploadResponse(<Alert variant="success" className="mt-3">{data.message}</Alert>);
+            setTimeout(() => {
+                setSubmit("Submit");
+                setUploadResponse('');
+                handleClose();
+                setJobName('');
+                setCpus('');
+                setMemory('');
+                setTime('');
+                setFile(null);
+            }, 3000);
+
+
+        } 
+        else {
+            console.error(response.message);
+            setSubmit("Submit");
+            setUploadResponse(<Alert variant="danger" className="mt-3">{data.message}</Alert>);
         }
     }
+
+    const handleTimeChange = (e) => {
+        let value = e.target.value;
+        value = value.replace(/[^0-9:]/g, ""); // Allow numeric characters and colon
+    
+        // Count the number of colons in the input
+        const colonCount = (value.match(/:/g) || []).length;
+    
+        if (colonCount < 1 && value.length > 2) {
+            // Insert first colon after two digits
+            value = value.slice(0, 2) + ":" + value.slice(2);
+        }
+        if (colonCount < 2 && value.length > 5) {
+            // Insert second colon after five characters
+            value = value.slice(0, 5) + ":" + value.slice(5);
+        }
+        // Limit length to 8 characters (hh:mm:ss)
+        value = value.slice(0, 8);
+        setTime(value);
+    };
 
 
 
@@ -60,15 +109,15 @@ export default function Upload()
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formCPU">
                         <Form.Label>Number of CPUs</Form.Label>
-                        <Form.Control type="number" placeholder="Enter Number of CPUs" onChange={(e) => {setCpus(e.target.value)}} value={cpus} required min={1} />
+                        <Form.Control type="number" placeholder="Enter Number of CPUs" onChange={(e) => {setCpus(e.target.value)}} value={cpus} required min={1} max={numCPUs} />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formMemory">
                         <Form.Label>Amount of Memory (MB)</Form.Label>
                         <Form.Control type="number" placeholder="Amount of Memory MB" onChange={(e) => {setMemory(e.target.value)}} value={memory} required min={1} />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formTime">
-                        <Form.Label>Time Allotment</Form.Label>
-                        <Form.Control type="number" placeholder="Enter Time Allotment" onChange={(e) => {setTime(e.target.value)}} value={time} required min={1} />
+                        <Form.Label>Time Allotment (hh:mm:ss)</Form.Label>
+                        <Form.Control type="text" placeholder="hh:mm:ss" onChange={handleTimeChange} value={time} required />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formFile">
                         <Form.Label>Upload File</Form.Label>
@@ -77,9 +126,10 @@ export default function Upload()
                     
 
                     <Button variant="primary" type="submit">
-                        Submit
+                        {submit}
                     </Button>
                 </Form>
+                {uploadResponse}
             </Modal.Body>
         </Modal>
         </>

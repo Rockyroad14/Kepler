@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 // Program Schema with associated data needed.
-const programSchema = new mongoose.Schema({
+const JobSchema = new mongoose.Schema({
 
     jobName: { type: String, required: true, unique: true, },
     
@@ -18,10 +18,10 @@ const programSchema = new mongoose.Schema({
 
     memory: { type: Number, required: true, },
 
-    maxTime: { type: Number, required: true, },
+    maxTime: { type: String, required: true, },
 })
 
 
-const Program = mongoose.model('Program', programSchema);
+const Job = mongoose.model('Job', JobSchema);
 
-module.exports = Program;
+module.exports = Job;

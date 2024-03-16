@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const User = require('./datamodels/user');
+const Job = require('./datamodels/program');
 const bodyParser = require('body-parser');
 const { spawn } = require('child_process');
 require('dotenv').config();
@@ -91,6 +92,11 @@ app.post('/api/tokenlogin', async (req, res) => {
 
         res.status(200).json({ message: 'Token validated successfully' });
     } catch (error) {
+
+        if(error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+
         res.status(401).json({ message: 'Internal Server Error' });
     }
 })
@@ -193,14 +199,49 @@ app.get('/api/users/loadtables' , async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.userId;
     try {
-        const stagedJobs = await Job.find({userId: userId, status: 'staged'});
-        const activeJobs = await Job.find({userId: userId, status: 'active'});
-        const completedJobs = await Job.find({userId: userId, status: 'completed'});
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const stagedJobs = await Job.find({author: userId, stateCode: 'staged'});
+        const activeJobs = await Job.find({author: userId, stateCode: 'active'});
+        const completedJobs = await Job.find({author: userId, stateCode: 'completed'});
+
+        res.status(200).json({stagedJobs, activeJobs, completedJobs});
     }
     catch (error) {
+
         console.error('Error getting jobs', error);
+
+        if(error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+        
         res.status(500).json({ error: 'Error getting jobs' });
     }
+});
+
+app.post('/api/users/stagejob', async (req, res) => {
+  
+    try {
+        const token = req.headers['kepler-token'];
+
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        res.status(200).json({ message: 'Job uploaded successfully' });
+
+    } catch (error) {
+
+        if(error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+
+        console.error('Error staging job', error);
+        res.status(500).json({ error: 'Error staging job' });
+    }
+
 });
 
 // Delete user given an email
@@ -222,10 +263,7 @@ app.delete('/api/users', async (req, res) => {
     }
 });
 
-// Stages container file and variables in the database
-app.post('/upload-job',(req, res) => {
 
-});
 
 // Endpoint to start a SLURM job based on an uploaded container
 app.post('/submit-job',(req, res) => {
