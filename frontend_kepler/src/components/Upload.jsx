@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -15,10 +16,11 @@ const numCPUs = import.meta.env.VITE_REACT_APP_NUM_CPUS
 
 export default function Upload()
 {
+    const navigate = useNavigate();
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const [show, setShow] = useState(false);
-    const [file, setFile] = useState(null);
+    const [container, setContainer] = useState(null);
     const [jobName, setJobName] = useState('');
     const [cpus, setCpus] = useState('');
     const [memory, setMemory] = useState('');
@@ -26,21 +28,46 @@ export default function Upload()
     const [submit, setSubmit] = useState("Submit");
     const [uploadResponse, setUploadResponse] = useState('');
 
+    const handleFileChange = (e) => {
+        let containered = e.target.files[0];
+
+        if (containered && containered.name.endsWith('.tar')) {
+            console.log('Valid file type');
+            console.log(containered);
+            setContainer(containered);
+        } else {
+            console.log('Invalid file type. Please upload a .tar file');
+            setContainer(null);
+            setUploadResponse(<Alert variant="danger" className="mt-3">Invalid file type. Please upload a .tar file</Alert>);
+        }
+    }
+
 
     const handleUpload = async (e) => {
+
+        
         e.preventDefault();
         setSubmit(<Spinner animation="border" role="status" size="sm" />);
+
+        // Print all data for debugging
+        console.log('Job Name: ' + jobName);
+        console.log('CPUs: ' + cpus);
+        console.log('Memory: ' + memory);
+        console.log('Max Time: ' + time);
+        console.log('Container: ' + container);
+
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', container);
         formData.append('jobName', jobName);
         formData.append('cpus', cpus);
         formData.append('memory', memory);
-        formData.append('time', time);
+        formData.append('maxTime', time);
         const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/stagejob`, {
             method: 'POST',
             body: formData,
             headers: {
-                'kepler-token': localStorage.getItem('kepler-token')
+                'kepler-token': localStorage.getItem('kepler-token'),
+                'encoding': 'multipart/form-data'
             }
         });
     
@@ -57,11 +84,22 @@ export default function Upload()
                 setCpus('');
                 setMemory('');
                 setTime('');
-                setFile(null);
+                setContainer('');
             }, 3000);
 
 
         } 
+        else if(response.status === 401) {
+            console.error(data.message);
+            setSubmit("Submit");
+            setUploadResponse(<Alert variant="danger" className="mt-3">{data.message}</Alert>);
+            setTimeout(() => {
+                localStorage.removeItem('kepler-token');
+                navigate('/');
+            }, 3000);
+
+        }
+
         else {
             console.error(response.message);
             setSubmit("Submit");
@@ -103,9 +141,9 @@ export default function Upload()
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleUpload}>
-                    <Form.Group className="mb-3" controlId="">
+                    <Form.Group className="mb-3" controlId="formName">
                         <Form.Label>Job Name</Form.Label>
-                        <Form.Control type="text" placeholder="Enter Job Name" onChange={(e) => setJobName(e.target.value)} value={jobName} required />
+                        <Form.Control type="text" placeholder="Enter Job Name" onChange={(e) => {setJobName(e.target.value)}} value={jobName} required />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formCPU">
                         <Form.Label>Number of CPUs</Form.Label>
@@ -120,8 +158,8 @@ export default function Upload()
                         <Form.Control type="text" placeholder="hh:mm:ss" onChange={handleTimeChange} value={time} required />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formFile">
-                        <Form.Label>Upload File</Form.Label>
-                        <Form.Control type="file" onChange={(e) => {setFile(e.target.value)}} value={file} required />
+                        <Form.Label>Upload Container</Form.Label>
+                        <Form.Control type="file" accept=".tar" onChange={handleFileChange} required />
                     </Form.Group>
                     
 

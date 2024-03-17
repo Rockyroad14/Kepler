@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react"
+import React, { useEffect, useState } from "react"
 import DashNavbar from "./DashNavbar";
 import Table from "react-bootstrap/Table";
 import Container from "react-bootstrap/Container";
@@ -17,8 +17,6 @@ const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
 export default function DashBoard() {
 
     const navigation = useNavigate();
-
-    const [file, setFile] = useState(null);
     const [tableData, setTableData] = useState({ activeJobs: [], stagedJobs: [], completedJobs: [] });
 
     // Token Validation Function

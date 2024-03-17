@@ -8,7 +8,9 @@ const bcrypt = require('bcryptjs');
 const User = require('./datamodels/user');
 const Job = require('./datamodels/program');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const { spawn } = require('child_process');
+const fs = require('fs');
 require('dotenv').config();
 
 // Initial variables
@@ -23,6 +25,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(bodyParser.json());
+const upload = multer();
 
 app.use(express.static(path.join(__dirname, '/../frontend_kepler/dist')));
 
@@ -196,8 +199,7 @@ app.get('/api/users', async (req, res) => {
 
 app.get('/api/users/loadtables' , async (req, res) => {
     const token = req.body.token;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
+
     try {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -221,16 +223,40 @@ app.get('/api/users/loadtables' , async (req, res) => {
     }
 });
 
-app.post('/api/users/stagejob', async (req, res) => {
+app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
   
     try {
         const token = req.headers['kepler-token'];
 
-
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
-        res.status(200).json({ message: 'Job uploaded successfully' });
+        // Check to see if jobName is unique and return an error if it is not
+        const { jobName, cpus, memory, maxTime } = req.body;
+
+        const existingJob = await Job.findOne({ jobName });
+
+        if (existingJob) {
+            return res.status(400).json({ error: 'Job with this name already exists' });
+        }
+        // Console print statements for debugging
+        console.log(cpus, memory, maxTime, jobName, userId);
+
+        // With request body, create a new job and save it to the database and save the container file in the jobs folder with jobName
+        const newJob = new Job({ jobName, author: userId, stateCode: 'staged', cpus, memory, maxTime });
+
+        await newJob.save();
+
+        // Save the container file in the jobs folder with another folder with the jobName and a folder in that named ouput
+        // This is where the output will be stored
+        const container = req.file;
+        const containerPath = path.join(__dirname, '/jobs', jobName);
+        const outputPath = path.join(containerPath, '/output');
+        fs.mkdirSync(containerPath, { recursive: true });
+        fs.mkdirSync(outputPath , { recursive: true });
+        fs.writeFileSync(path.join(containerPath, container.originalname), container.buffer);
+
+        res.status(201).json({ message: 'Job staged successfully' });
 
     } catch (error) {
 

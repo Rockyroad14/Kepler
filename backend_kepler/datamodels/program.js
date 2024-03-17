@@ -8,11 +8,7 @@ const JobSchema = new mongoose.Schema({
     
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
-    container: { type: String, required: true, },
-
     stateCode: { type: String, required: true, },
-
-    nodes: { type: Number, required: true, },
 
     cpus: { type: Number, required: true, },
 
