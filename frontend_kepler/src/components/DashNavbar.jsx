@@ -8,26 +8,42 @@ import Admin from "./Admin";
 import Profile from "./Profile";
 import { useNavigate } from 'react-router-dom';
 
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT;
+
 
 export default function DashNavbar() {
   
   const navigation = useNavigate();
   const [showAdmin, setShowAdmin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [isAdmin, setIsAdmin] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const handleShowAdmin = () => setShowAdmin(true);
   const handleCloseAdmin = () => setShowAdmin(false);
   const handleShowProfile = () => setShowProfile(true);
   const handleCloseProfile = () => setShowProfile(false);
 
-  const getUserRole = () => {
-    
+  const getUserRole = async () => {
+    const token = localStorage.getItem("kepler-token");
+    const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/usertype`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "kepler-token": token
+      }
+    })
+
+    if(response.ok){
+      console.log("User is an admin");
+      setIsAdmin(true);
+    } else {
+      console.log("User is not an admin");
+    }
   }
 
   useEffect(() => {
-    const userRole = getUserRole();
-    setIsAdmin(userRole);
+    getUserRole();
   })
 
   const handleSignOut = () => {
@@ -48,7 +64,7 @@ export default function DashNavbar() {
             <Nav className="mr-auto" variant="underline">
               <Link to="/dashboard" className="nav-link">
                 <i class="bi bi-house-fill"></i> Home</Link>
-              {isAdmin === 1 && (<Nav.Link onClick={handleShowAdmin}><i class="bi bi-database-fill-gear"></i> Admin</Nav.Link>)}
+              {isAdmin == true && (<Nav.Link onClick={handleShowAdmin}><i class="bi bi-database-fill-gear"></i> Admin</Nav.Link>)}
               <Nav.Link onClick={handleShowProfile}><i class="bi bi-person-circle"></i> Profile</Nav.Link>
               <Nav.Link onClick={handleSignOut}>Sign Out <i class="bi bi-arrow-bar-right"></i></Nav.Link>
             </Nav>

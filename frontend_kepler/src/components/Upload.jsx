@@ -49,13 +49,6 @@ export default function Upload()
         e.preventDefault();
         setSubmit(<Spinner animation="border" role="status" size="sm" />);
 
-        // Print all data for debugging
-        console.log('Job Name: ' + jobName);
-        console.log('CPUs: ' + cpus);
-        console.log('Memory: ' + memory);
-        console.log('Max Time: ' + time);
-        console.log('Container: ' + container);
-
         const formData = new FormData();
         formData.append('file', container);
         formData.append('jobName', jobName);
@@ -79,12 +72,12 @@ export default function Upload()
             setTimeout(() => {
                 setSubmit("Submit");
                 setUploadResponse('');
-                handleClose();
                 setJobName('');
                 setCpus('');
                 setMemory('');
                 setTime('');
                 setContainer('');
+                handleClose();
             }, 3000);
 
 

@@ -50,6 +50,15 @@ const generateToken = (userId) => {
     }
 }
 
+const getUserType = async (userId) => {
+    try {
+        const user = await User.findOne({ _id: userId });
+        return user.userType;
+    } catch (error) {
+        throw new Error('Error getting user type');
+    }
+}
+
 // Endpoints
 
 // Check to see if request body is JSON web token or has email and password
@@ -205,10 +214,20 @@ app.get('/api/users/loadtables' , async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
-        const stagedJobs = await Job.find({author: userId, stateCode: 'staged'});
-        const activeJobs = await Job.find({author: userId, stateCode: 'active'});
-        const completedJobs = await Job.find({author: userId, stateCode: 'completed'});
-
+        // Check to see if user is an admin or super admin
+        if( getUserType(userId) === 0  || getUserType(userId) === 1){
+        
+            // Get all jobs from the database and return them in the response
+            const stagedJobs = await Job.find({ stateCode: 'staged' });
+            const activeJobs = await Job.find({ stateCode: 'active'});
+            const completedJobs = await Job.find({ stateCode: 'completed'});
+        }
+        else{
+            // Get all jobs from the database and return them in the response
+            const stagedJobs = await Job.find({author: userId, stateCode: 'staged'});
+            const activeJobs = await Job.find({author: userId, stateCode: 'active'});
+            const completedJobs = await Job.find({author: userId, stateCode: 'completed'});
+        }
         res.status(200).json({stagedJobs, activeJobs, completedJobs});
     }
     catch (error) {
@@ -220,6 +239,29 @@ app.get('/api/users/loadtables' , async (req, res) => {
         }
         
         res.status(500).json({ error: 'Error getting jobs' });
+    }
+});
+
+// returns state code of 200 if the user is an admin or super admin
+app.get('/api/users/usertype' , async (req, res) => {
+    const token = req.headers['kepler-token'];
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const userType = await getUserType(userId);
+
+        if(userType === 0 || userType === 1){
+            res.status(200).send({message:'Admin'});
+        }
+        else{
+            res.status(401).send( {message: 'Not an Admin'} );
+        }
+    }
+    catch (error) {
+        console.error('Error getting user type', error);
+        res.status(500).json({ error: 'Error getting user type' });
     }
 });
 
