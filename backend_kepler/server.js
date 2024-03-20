@@ -29,9 +29,6 @@ const upload = multer();
 
 app.use(express.static(path.join(__dirname, '/../frontend_kepler/dist')));
 
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, '/..frontend_kepler/dist', 'index.html'));
-});
 
 // Mongo database connection and error handler
 mongoose.connect(mongoURI);
@@ -402,6 +399,18 @@ app.post('/job-output', (req, res) => {
     // Output will most likely be put in jobs folder
     // Grab the output based on the jobs outputName
     res.send(`Output data for job ${jobID}`);
+});
+
+app.use((req, res, next) => {
+    const validPaths = ['/', '/dashboard']; // add your valid paths here
+    if (!validPaths.includes(req.path)) {
+        return res.redirect('/');
+    }
+    next();
+});
+
+app.get('*', function (req, res) {
+    res.sendFile(path.join(__dirname, '/../frontend_kepler/dist', 'index.html'));
 });
 
 // Runs on localhost by default, for remote testing change to port, host,
