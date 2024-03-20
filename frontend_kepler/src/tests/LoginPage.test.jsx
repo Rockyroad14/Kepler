@@ -1,19 +1,46 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {render, fireEvent, waitFor, cleanup} from '@testing-library/react'
 import LoginPage from '../components/LoginPage';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter, useNavigate } from 'react-router-dom';
 import HandleLogin from '../components/HandleLogin';
+import TokenValidation from '../components/TokenValidation';
 
 
 // Mock the TokenValidation function
-vi.mock("../components/TokenValidation")
-vi.mock('../components/HandleLogin')
+vi.mock("../components/TokenValidation", () => ({
+  default: vi.fn()
+}))
+
+
+vi.mock('../components/HandleLogin', () => ({
+  default: vi.fn()
+}))
+
+const mockedUsedNavigate = vi.fn();
+
+vi.mock('react-router-dom', () => ({
+  ...vi.importActual('react-router-dom'),
+  useNavigate: () => mockedUsedNavigate,
+  BrowserRouter: ({ children }) => <div>{children}</div>, // Mock BrowserRouter
+  MemoryRouter: ({ children }) => <div>{children}</div>, // Mock BrowserRouter
+  
+}));
+
+
 
 
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockedUsedNavigate.mockReset();
+    
+
   })
+
+  // afterEach(() => {
+  //   window.location.href = 'http://localhost:3000/'
+  // })
+
   test('LoginPage renders as expected', async () => {
       const {getByTestId } = render(<BrowserRouter><LoginPage /></BrowserRouter>);
       const emailInput = getByTestId("email");
@@ -39,13 +66,9 @@ describe('LoginPage', () => {
     })
 
     test('Submits login form with info provided', async () => {
-      
-      
+
 
       const {getByTestId } = render(<BrowserRouter><LoginPage/></BrowserRouter>);
-
-     
-      
       const emailInput = getByTestId("email");
       const passwordInput = getByTestId("password");
       const submitForm = getByTestId("submitForm");
@@ -60,29 +83,61 @@ describe('LoginPage', () => {
         'email@email.com', 'password'
       );
 
+      
+
+
     })
 
-    test('Gives error if improper email', async () => {
-      
-      
+    test('Navigates to dashboard if successful login', async () => {
 
-      const {getByTestId, getByText } = render(<BrowserRouter><LoginPage/></BrowserRouter>);
-
-     
-      
-      const emailInput = getByTestId("email");
-      const passwordInput = getByTestId("password");
+  
+      // for some reason fireEvent submit bypasses the react bootstrap checks so ignore that
+      const {getByTestId } = render(<BrowserRouter><LoginPage/></BrowserRouter>);
       const submitForm = getByTestId("submitForm");
+
+      HandleLogin.mockResolvedValue(true);
 
       await waitFor(() => {
         fireEvent.submit(submitForm)
       });
 
-      expect(HandleLogin).toBeCalled()
+      
 
-    
-      
-      
+      expect(mockedUsedNavigate).toHaveBeenCalledWith("/dashboard");
 
     })
+
+    test('Does not navigate to dashboard on unsuccessful login', async () => {
+      
+       // for some reason fireEvent submit bypasses the react bootstrap checks so ignore that
+      const {getByTestId } = render(<BrowserRouter><LoginPage/></BrowserRouter>);
+      const submitForm = getByTestId("submitForm");
+
+      HandleLogin.mockResolvedValue(false);
+
+      await waitFor(() => {
+        fireEvent.submit(submitForm)
+      });
+
+      
+
+      expect(mockedUsedNavigate).not.toHaveBeenCalled();
+
+    })
+
+  //   test('Existing login token redirects you to dashboard', async () => {
+
+  //     TokenValidation.mockReturnValue(true);
+      
+      
+  //     // for some reason fireEvent submit bypasses the react bootstrap checks so ignore that
+  //     render(<MemoryRouter><LoginPage/></MemoryRouter>);
+
+      
+  //     expect(TokenValidation).toHaveBeenCalled()
+  //     // expect(mockedUsedNavigate).not.toHaveBeenCalled();
+  //     // expect(window.location.pathname).toBe("/dashboard")
+       
+  //  })
+    
   })
