@@ -56,6 +56,9 @@ const getUserType = async (userId) => {
     }
 }
 
+const isJobAuthor = async (userId, jobId) => {
+}
+
 // Endpoints
 
 // Check to see if request body is JSON web token or has email and password
@@ -203,29 +206,40 @@ app.get('/api/users', async (req, res) => {
 });
 
 
-app.get('/api/users/loadtables' , async (req, res) => {
-    const token = req.body.token;
+app.post('/api/users/loadtables' , async (req, res) => {
+    // Get the token from the request header under authorization
+    const body = req.body;
+    const token = body.token;
 
     try {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
 
+        let stagedJobs, completedJobs, activeJobsWithOwnership;
+
+        const activeJobs = await Job.find({ stateCode: 'active'});
+
         // Check to see if user is an admin or super admin
-        if( getUserType(userId) === 0  || getUserType(userId) === 1){
+        if(getUserType(userId) === 0  || getUserType(userId) === 1){
         
             // Get all jobs from the database and return them in the response
-            const stagedJobs = await Job.find({ stateCode: 'staged' });
-            const activeJobs = await Job.find({ stateCode: 'active'});
-            const completedJobs = await Job.find({ stateCode: 'completed'});
+            stagedJobs = await Job.find({ stateCode: 'staged' });
+            completedJobs = await Job.find({ stateCode: 'completed'});
+            // Add a field to each job to indicate the user is the author since they are an admin
+            activeJobsWithOwnership = activeJobs.map(job => ({...job._doc, isAuthor: true}));
         }
         else{
             // Get all jobs from the database and return them in the response
-            const stagedJobs = await Job.find({author: userId, stateCode: 'staged'});
-            const activeJobs = await Job.find({author: userId, stateCode: 'active'});
-            const completedJobs = await Job.find({author: userId, stateCode: 'completed'});
+            stagedJobs = await Job.find({author: userId, stateCode: 'staged'});
+            completedJobs = await Job.find({author: userId, stateCode: 'completed'});
+            activeJobsWithOwnership = activeJobs.map(job => ({
+                ...job._doc,
+                isAuthor: String(job.author) === userId
+            }));
         }
-        res.status(200).json({stagedJobs, activeJobs, completedJobs});
+
+        res.status(200).json({stagedJobs, activeJobs: activeJobsWithOwnership, completedJobs});
     }
     catch (error) {
 
@@ -257,6 +271,9 @@ app.get('/api/users/usertype' , async (req, res) => {
         }
     }
     catch (error) {
+        if(error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
         console.error('Error getting user type', error);
         res.status(500).json({ error: 'Error getting user type' });
     }

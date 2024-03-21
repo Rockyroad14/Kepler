@@ -9,6 +9,7 @@ import Placeholder from "react-bootstrap/Placeholder";
 import Upload from "./Upload";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import TokenValidation from "./TokenValidation";
+import Button from "react-bootstrap/Button";
 
 const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
 const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
@@ -28,10 +29,46 @@ export default function DashBoard() {
 
     // After tokenValidation, load active, staged, and Completed jobs into corresponding tables
     const loadJobQueues = async () => {
-        
+        const token = localStorage.getItem("kepler-token");
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/loadtables`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token: token }),
+        });
+
+        const data = await response.json();
+        console.log(data);
+        setTableData(data);
     }
 
+    // Handles deletion of a staged or completed job
+    const handleDelete = async (id) => {
+        const confirm = window.confirm("Are you sure you want to delete this job?");
+        if (confirm) {
+            const token = localStorage.getItem("kepler-token");
 
+
+
+
+
+        }
+    }
+
+    // Handles the download of a completed job
+    const handleDownload = async (id) => {
+        const token = localStorage.getItem("kepler-token");
+
+
+
+    }
+
+    // Handles the cancelation of an active job
+    const handleCancel = async (id) => {
+        const token = localStorage.getItem("kepler-token");
+
+    }
 
 
     // On page load, check for JSON Web Token in local storage with user's credentials, if none, redirect to login page
@@ -60,7 +97,7 @@ export default function DashBoard() {
                 <Row>
                     <Col>
 
-                        <Table className="table-striped">
+                        <Table className="table-striped" hover>
                             <thead>
                                 <th>Job Name</th>
                                 <th>Status</th>
@@ -87,11 +124,15 @@ export default function DashBoard() {
                                 </>
                             ) : (
                                 tableData.activeJobs.map(job => (
-                                <tr key={job.id}>
-                                    <td>{job.name}</td>
-                                    <td>{job.status}</td>
+                                <tr key={job._id}>
+                                    <td>{job.jobName}</td>
+                                    <td>{job.stateCode}</td>
                                     <td>
-                                        
+                                        {job.isAuthor && (
+                                            <>
+                                                <Button variant="danger">cancel</Button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))
@@ -105,7 +146,7 @@ export default function DashBoard() {
                 <Row>
                     <Col>
                         <h4>Staged Jobs</h4>
-                        <Table>
+                        <Table hover className="table-striped">
                             <thead>
                                 <th>Job Name</th>
                                 <th>Status</th>
@@ -132,10 +173,14 @@ export default function DashBoard() {
                                     </>
                                     ) : (
                                         tableData.stagedJobs.map(job => (
-                                        <tr key={job.id}>
-                                            <td>{job.name}</td>
-                                            <td>{job.status}</td>
-                                            <td>{job.actions}</td>
+                                        <tr key={job._id}>
+                                            <td>{job.jobName}</td>
+                                            <td colSpan={4}>
+                                                <ProgressBar now={100} variant="info" className="mt-3" animated></ProgressBar>
+                                            </td>
+                                            <td className="text-end" colSpan={4}>
+                                                <Button onClick={() => handleDelete(job._id)} variant="outline-danger"><i class="bi bi-x-circle"></i> Delete</Button>
+                                            </td>
                                         </tr>
                                     ))
                                 )}
@@ -148,7 +193,7 @@ export default function DashBoard() {
                 <Row>
                     <Col>
                         <h4>Completed Jobs</h4>
-                        <Table>
+                        <Table hover className="table-striped">
                             <thead>
                                 <th>Job Name</th>
                                 <th>Status</th>
@@ -175,10 +220,13 @@ export default function DashBoard() {
                                     </>
                                     ) : (
                                         tableData.completedJobs.map(job => (
-                                        <tr key={job.id}>
-                                            <td>{job.name}</td>
-                                            <td>{job.status}</td>
-                                            <td>{job.actions}</td>
+                                        <tr key={job._id}>
+                                            <td>{job.jobName}</td>
+                                            <td>{job.stateCode}<ProgressBar variant="success" now={100}></ProgressBar></td>
+                                            <td>
+                                                <Button>download</Button>
+                                                <Button onClick={() => handleDelete(job._id)} variant="danger">delete</Button>
+                                            </td>
                                         </tr>
                                     ))
                                 )}

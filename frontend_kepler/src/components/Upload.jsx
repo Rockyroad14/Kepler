@@ -6,6 +6,7 @@ import { useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import { useNavigate } from 'react-router-dom';
+import DashBoard from './Dashboard';
 
 
 
@@ -80,7 +81,7 @@ export default function Upload()
                 handleClose();
             }, 3000);
 
-
+            DashBoard.loadJobs();
         } 
         else if(response.status === 401) {
             console.error(data.message);
@@ -98,6 +99,7 @@ export default function Upload()
             setSubmit("Submit");
             setUploadResponse(<Alert variant="danger" className="mt-3">{data.message}</Alert>);
         }
+
     }
 
     const handleTimeChange = (e) => {
