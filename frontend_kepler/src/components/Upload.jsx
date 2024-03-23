@@ -128,7 +128,7 @@ export default function Upload()
 
     return(
         <>
-        <Button variant='secondary' onClick={handleShow}>New <i class="bi bi-plus"></i></Button>
+        <Button variant='primary' onClick={handleShow}><i class="bi bi-plus"></i></Button>
 
         <Modal show={show} onHide={handleClose} centered data-bs-theme="">
             <Modal.Header closeButton>

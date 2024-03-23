@@ -7,6 +7,7 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 import Admin from "./Admin";
 import Profile from "./Profile";
 import { useNavigate } from 'react-router-dom';
+import getUserRole from "./getUserRole";
 
 const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
 const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT;
@@ -24,17 +25,8 @@ export default function DashNavbar() {
   const handleShowProfile = () => setShowProfile(true);
   const handleCloseProfile = () => setShowProfile(false);
 
-  const getUserRole = async () => {
-    const token = localStorage.getItem("kepler-token");
-    const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/usertype`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "kepler-token": token
-      }
-    })
-
-    if(response.ok){
+  const GetUserRole = async () => {
+    if ((await getUserRole())) {
       console.log("User is an admin");
       setIsAdmin(true);
     } else {
@@ -43,7 +35,7 @@ export default function DashNavbar() {
   }
 
   useEffect(() => {
-    getUserRole();
+    GetUserRole()
   })
 
   const handleSignOut = () => {
@@ -63,10 +55,10 @@ export default function DashNavbar() {
           <Navbar.Collapse className="justify-content-right" variant="blue">
             <Nav className="mr-auto" variant="underline">
               <Link to="/dashboard" className="nav-link">
-                <i class="bi bi-house-fill"></i> Home</Link>
-              {isAdmin == true && (<Nav.Link onClick={handleShowAdmin}><i class="bi bi-database-fill-gear"></i> Admin</Nav.Link>)}
-              <Nav.Link onClick={handleShowProfile}><i class="bi bi-person-circle"></i> Profile</Nav.Link>
-              <Nav.Link onClick={handleSignOut}>Sign Out <i class="bi bi-arrow-bar-right"></i></Nav.Link>
+                <i className="bi bi-house-fill"></i> Home</Link>
+              {isAdmin == true && (<Nav.Link onClick={handleShowAdmin}><i className="bi bi-database-fill-gear"></i> Admin</Nav.Link>)}
+              <Nav.Link onClick={handleShowProfile}><i className="bi bi-person-circle"></i> Profile</Nav.Link>
+              <Nav.Link onClick={handleSignOut}>Sign Out <i className="bi bi-arrow-bar-right"></i></Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

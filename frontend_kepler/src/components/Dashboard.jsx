@@ -48,10 +48,21 @@ export default function DashBoard() {
         const confirm = window.confirm("Are you sure you want to delete this job?");
         if (confirm) {
             const token = localStorage.getItem("kepler-token");
+            const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/deletejob`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token: token, jobId: id }),
+            });
 
+            if (response.ok) {
+                handleRefresh();
+            }
 
-
-
+            else {
+                console.log("Job deletion failed", response.status, response.statusText);
+            }
 
         }
     }
@@ -70,6 +81,15 @@ export default function DashBoard() {
 
     }
 
+    // Handles clearing the all of the tables of jobs. Used in the handleRefresh function
+    const handleClearQueues = async () => {
+        setTableData({ activeJobs: [], stagedJobs: [], completedJobs: [] });
+    }
+
+    const handleRefresh = async () => {
+        handleClearQueues();
+        loadJobQueues();
+    }
 
     // On page load, check for JSON Web Token in local storage with user's credentials, if none, redirect to login page
     useEffect(() => {
@@ -90,8 +110,13 @@ export default function DashBoard() {
                     <Col sm={11}>
                         <h4>Active Job Queue</h4>
                     </Col>
-                    <Col className="justify-content-end">
-                        <Upload/>
+                </Row>
+                <Row>
+                    <Col className="d-flex align-items-center justify-content-end">
+                        <Button onClick={handleRefresh} variant="secondary"><i class="bi bi-arrow-clockwise"></i></Button>
+                        <div className="ms-1">
+                            <Upload/>
+                        </div>
                     </Col>
                 </Row>
                 <Row>
@@ -150,7 +175,7 @@ export default function DashBoard() {
                             <thead>
                                 <th>Job Name</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <th className="text-end">Actions</th>
                             </thead>
                             <tbody id="inactiveTable">
                                 {tableData.stagedJobs.length === 0 ? (
