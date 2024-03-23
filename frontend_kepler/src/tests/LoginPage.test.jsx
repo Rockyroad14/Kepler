@@ -4,6 +4,7 @@ import LoginPage from '../components/LoginPage';
 import { BrowserRouter, MemoryRouter, useNavigate } from 'react-router-dom';
 import HandleLogin from '../components/HandleLogin';
 import TokenValidation from '../components/TokenValidation';
+import { act } from 'react-dom/test-utils';
 
 
 // Mock the TokenValidation function
@@ -125,19 +126,21 @@ describe('LoginPage', () => {
 
     })
 
-  //   test('Existing login token redirects you to dashboard', async () => {
+    test('Existing login token redirects you to dashboard', async () => {
 
-  //     TokenValidation.mockReturnValue(true);
+      TokenValidation.mockReturnValue(true);
       
       
-  //     // for some reason fireEvent submit bypasses the react bootstrap checks so ignore that
-  //     render(<MemoryRouter><LoginPage/></MemoryRouter>);
+      // for some reason fireEvent submit bypasses the react bootstrap checks so ignore that
+      await act(async () => {
+        render(<MemoryRouter><LoginPage/></MemoryRouter>);
+      })
 
       
-  //     expect(TokenValidation).toHaveBeenCalled()
-  //     // expect(mockedUsedNavigate).not.toHaveBeenCalled();
-  //     // expect(window.location.pathname).toBe("/dashboard")
+      expect(TokenValidation).toHaveBeenCalled()
+      expect(mockedUsedNavigate).toHaveBeenCalled();
+      // expect(window.location.pathname).toBe("/dashboard")
        
-  //  })
+   })
     
   })
