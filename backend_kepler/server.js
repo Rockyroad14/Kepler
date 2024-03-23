@@ -57,11 +57,17 @@ const getUserType = async (userId) => {
 }
 
 const isJobAuthor = async (userId, jobId) => {
+    try {
+        const job = await Job.findOne({ _id: jobId });
+        return String(job.author) === userId;
+    } catch (error) {
+        throw new Error('Error checking job author');
+    }
 }
 
 // Endpoints
 
-// Check to see if request body is JSON web token or has email and password
+// Login Function
 app.post('/api/login', async (req, res) => {
 
     const { email, password } = req.body;
@@ -384,7 +390,7 @@ app.delete('/api/users', async (req, res) => {
 
 
 // Endpoint to start a SLURM job based on an uploaded container
-app.post('/submit-job',(req, res) => {
+app.post('/api/users/submit-job',(req, res) => {
     // Get the request body
     const job = req.body;
 
@@ -410,20 +416,40 @@ app.post('/submit-job',(req, res) => {
 });
 
 // Endpoint to cancel a SLURM job
-app.post('/stop-job', (req, res) => {
+app.post('/api/users/stop-job', (req, res) => {
     const jobID = req.body.jobID;
+    const token = req.body.token;
+    try {
 
-    // Execute SLURM command to stop the job
-    const stopJobProcess =  spawn('sudo', ['scancel', jobID]);
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
 
-    // Error handling
-    stopJobProcess.on('exit', (code) => {
-        if (code === 0) {
-            res.send(`Job ${jobID} stopped successfully`);
-        } else {
-            res.status(500).send(`Failed to stop job ${jobID} ${code}`);
+        if (!isJobAuthor(userId, jobID)) {
+            return res.status(403).json({ message: 'Unauthorized' });
         }
-    });
+
+        // Execute SLURM command to stop the job
+        const stopJobProcess =  spawn('sudo', ['scancel', jobID]);
+
+        // Error handling
+        stopJobProcess.on('exit', (code) => {
+            if (code === 0) {
+                res.status(200).json({ message: `Job ${jobID} stopped successfully` });
+            } else {
+                res.status(500).send(`Failed to stop job ${jobID} ${code}`);
+            }
+        });
+
+
+    } catch (error) {
+
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+
+        res.status(500).json({ message: `Error stopping job ${jobID}` });
+    }
 });
 
 // Endpoint to check the status of a SLURM job
@@ -444,9 +470,12 @@ app.post('/check-job', (req, res) => {
     });
 });
 
+
 // Endpoint to send output data from a SLURM job
 app.post('/job-output', (req, res) => {
     const jobID = req.body.jobID;
+
+
 
     // TODO: Once output type is determined this can be setup
     // Output will most likely be put in jobs folder

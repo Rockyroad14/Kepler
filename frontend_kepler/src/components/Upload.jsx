@@ -7,6 +7,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import { useNavigate } from 'react-router-dom';
 import DashBoard from './Dashboard';
+import { Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 
 
@@ -128,7 +129,9 @@ export default function Upload()
 
     return(
         <>
-        <Button variant='primary' onClick={handleShow}><i class="bi bi-plus"></i></Button>
+        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Upload New Job</Tooltip>}>
+            <Button variant='primary' onClick={handleShow}><i class="bi bi-plus"></i></Button>
+        </OverlayTrigger>
 
         <Modal show={show} onHide={handleClose} centered data-bs-theme="">
             <Modal.Header closeButton>

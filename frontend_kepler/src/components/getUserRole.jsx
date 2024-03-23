@@ -1,10 +1,13 @@
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT;
+
 const getUserRole = async () => {
     const token = localStorage.getItem("kepler-token");
     const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/usertype`, {
         method: "GET",
         headers: {
-        "Content-Type": "application/json",
-        "kepler-token": token
+            "Content-Type": "application/json",
+            "kepler-token": token
         }
     })
 
