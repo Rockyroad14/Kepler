@@ -173,7 +173,7 @@ app.put('/api/users/password', async (req, res) => {
 });
 
 // Upgrade user priveleges to admin
-app.put('/api/users/usertype', async (req, res) => {
+app.put('/api/users/usertypeUpgrade', async (req, res) => {
     const userToUpdate = req.body;
 
     try {
@@ -203,6 +203,32 @@ app.get('/api/users', async (req, res) => {
         console.error('Error getting users', error);
         res.status(500).json({ error: 'Error getting users' });
     }
+});
+
+//checks token and returns current user type
+app.post('/api/verifyAdminToken', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'No token provided.' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+        if (err) {
+            return res.status(401).json({ message: 'Invalid token.' });
+        }
+
+        // Fetch the user from your database
+        // This is just a placeholder, replace it with your actual database query
+        const user = await User.findOne({ _id: decodedToken.userId });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        return res.json({ userType: user.userType });
+    });
 });
 
 

@@ -17,8 +17,34 @@ const Admin = () => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState('');
 
+    const getUserType = async (token) => {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/verifyAdminToken`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+    
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    
+        const { userType } = await response.json();
+        return userType;
+    };
+
     const handleCreateUser = async (event) => {
         event.preventDefault();
+
+        const token = localStorage.getItem("kepler-token");
+
+        const currentUserType = await getUserType(token);
+        // Owner and Admin can create a user
+        if (currentUserType !== 1 && currentUserType !== 0) {
+            console.error('Only admins or owners can create a user.');
+            return;
+        }
         
         let userType = 2;
         const user = { name, email, password, userType}; // userType is set to 'user' as an example
@@ -51,6 +77,16 @@ const Admin = () => {
 
     const handleUpgradeUser = async (event) => {
         event.preventDefault();
+
+        const token = localStorage.getItem("kepler-token");
+
+        const currentUserType = await getUserType(token);
+        // Owner is type 0
+        if (currentUserType !== 0) {
+            console.error('Only admins can upgrade a user.');
+            return;
+        }
+
         const userToUpgrade = users.find(user => user.name === selectedUser);
         const admin = 1;
     
@@ -64,7 +100,7 @@ const Admin = () => {
             return;
         }
     
-        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/usertype`, {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/usertypeUpgrade`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -84,6 +120,15 @@ const Admin = () => {
         try {
             const userToDelete = users.find(user => user.name === selectedUser);
 
+            const token = localStorage.getItem("kepler-token");
+
+            const currentUserType = await getUserType(token);
+            // Owner can delete a user
+            if (currentUserType !== 0) {
+                console.error('Only admins can delete a user.');
+                return;
+            }
+
             if (!userToDelete) {
                 console.error('User not found');
                 return;
@@ -102,7 +147,7 @@ const Admin = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
     
-            // Refresh the list of users or handle the response in some other way
+            // Refresh the list of users
             const data = await response.json();
             fetchUsers();
         } catch (error) {
