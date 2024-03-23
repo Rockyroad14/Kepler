@@ -326,6 +326,42 @@ app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
 
 });
 
+app.post('/api/users/deletejob', async (req, res) => {
+    const { token, jobId } = req.body;
+    
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const job = await Job.findOne({ _id: jobId });
+
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        if (String(job.author) !== userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        await Job.findByIdAndDelete(jobId);
+        // Delete job in the job in job folder
+        const jobPath = path.join(__dirname, '/jobs', job.jobName);
+        fs.rmSync(jobPath, { recursive: true });
+
+
+        res.status(200).json({ message: 'Job deleted successfully' });
+    } catch (error) {
+
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+
+        console.error('Error deleting job', error);
+        res.status(500).json({ error: 'Error deleting job' });
+    }
+});
+    
+
 // Delete user given an email
 app.delete('/api/users', async (req, res) => {
     const userToDelete  = req.body;
