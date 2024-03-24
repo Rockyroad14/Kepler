@@ -437,15 +437,9 @@ app.post('/api/users/submit-job', async (req, res) => {
 
         // Get the file container and remove the .tar extension from string
         const container = job.containerName.split('.tar')[0];
-        
-        
-
-
-
-
 
         // Run the command on a new thread
-        const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',job.container]);
+        const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',container]);
 
         // Listen for stdout data
         submittedJob.stdout.on('data', (data) => {
@@ -463,6 +457,11 @@ app.post('/api/users/submit-job', async (req, res) => {
                 res.status(500).send(`Failed to submit job code ${code}`);
             } 
         });
+        // Change stateCode to active
+        job.stateCode = 'active';
+        await job.save();
+
+        res.status(200).json({ message: 'Job submitted successfully' });
     } catch (error) {
 
         if (error instanceof jwt.TokenExpiredError) {
