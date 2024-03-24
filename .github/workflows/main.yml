@@ -2,8 +2,7 @@ name: CI
 
 on:
   push:
-    branches:
-      - main 
+    branches: [ "main" ]
 
 jobs:
   test:
@@ -11,10 +10,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('Kepler/frontend_kepler/package-lock.json') }}
