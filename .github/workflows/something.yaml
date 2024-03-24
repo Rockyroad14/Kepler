@@ -7,6 +7,10 @@ jobs:
     strategy:
         matrix:
           node-version: [19.x]
+
+    defaults: 
+        run: 
+            working-directory: frontend_kepler
   
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -25,14 +29,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: get to right directory
-        run: cd frontend_kepler
+
   
       - name: Install dependencies
         run: npm install
 
-      - name: get to right directory
-        run: cd frontend_kepler
   
       - name: Run the tests
         run: npm test
