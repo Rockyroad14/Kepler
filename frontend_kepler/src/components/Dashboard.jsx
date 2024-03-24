@@ -169,19 +169,19 @@ export default function DashBoard() {
                             {tableData.activeJobs.length === 0 ? (
                                 <>
                                     <Placeholder as="tr" animation="glow" bg="dark">
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
                                     </Placeholder>
                                     <Placeholder as="tr" animation="glow">
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
                                     </Placeholder>
                                     <Placeholder as="tr" animation="glow" bg="dark">
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
-                                        <td><Placeholder xs={12} bg="dark" size="sm" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
+                                        <td><Placeholder xs={12} bg="dark" size="xl" /></td>
                                     </Placeholder>
                                 </>
                             ) : (
@@ -239,7 +239,7 @@ export default function DashBoard() {
                                             <td>{job.jobName}</td>
                                             <td>
                                                 <div className="align-items-center">
-                                                    <ProgressBar now={100} variant="primary" className="mt-3" label={job.stateCode.toUpperCase()} />
+                                                    <ProgressBar now={100} variant="info" className="mt-3" style={{ height: '2rem', width: '100%'}} label={job.stateCode.toUpperCase()} />
                                                 </div>
                                             </td>
                                             <td>
@@ -248,7 +248,7 @@ export default function DashBoard() {
                                                         <button onClick={() => handleRun(job._id)} className="btn"><i class="bi bi-play-circle-fill text-success fs-2"></i></button>
                                                     </OverlayTrigger>
                                                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Delete Job</Tooltip>}>
-                                                        <button onClick={() => handleDelete(job._id)} className="btn"><i class="bi bi-x-circle text-danger fs-2 hover-red"></i></button>
+                                                        <button onClick={() => handleDelete(job._id)} className="btn"><i class="bi bi-x-circle text-danger fs-2"></i></button>
                                                     </OverlayTrigger>
                                                 </div>
                                             </td>
@@ -291,18 +291,26 @@ export default function DashBoard() {
                                     </>
                                     ) : (
                                         tableData.completedJobs.map(job => (
-                                        <tr key={job._id}>
-                                            <td>{job.jobName}</td>
-                                            <td><ProgressBar variant="success" now={100} label={job.stateCode.toUpperCase()} /></td>
-                                            <td>
-                                                <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Download Output</Tooltip>}>
-                                                    <button onClick={() => handleDownload(job._id)} className="btn"><i class="bi bi-download text-primary fs-2"></i></button>
-                                                </OverlayTrigger>
-                                                <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Delete Job</Tooltip>}>
-                                                    <CloseButton onClick={() => handleDelete(job._id)} variant="danger"></CloseButton>
-                                                </OverlayTrigger>
-                                            </td>
-                                        </tr>
+                                        <>
+                                            <tr key={job._id}>
+                                                <td>{job.jobName}</td>
+                                                <td>
+                                                    <div className="align-items-center">
+                                                        <ProgressBar variant="success" now={100} label={job.stateCode.toUpperCase()} className="mt-3" style={{ height: '2rem', width: '100%'}} />
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="d-flex align-items-center justify-content-end">
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Download Output</Tooltip>}>
+                                                            <button onClick={() => handleDownload(job._id)} className="btn"><i class="bi bi-download text-primary fs-3"></i></button>
+                                                        </OverlayTrigger>
+                                                        <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Delete Job</Tooltip>}>
+                                                            <CloseButton onClick={() => handleDelete(job._id)} variant="danger"></CloseButton>
+                                                        </OverlayTrigger>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </>
                                     ))
                                 )}
                             </tbody>

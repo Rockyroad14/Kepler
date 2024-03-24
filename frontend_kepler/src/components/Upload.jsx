@@ -6,7 +6,6 @@ import { useState } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 import Alert from 'react-bootstrap/Alert';
 import { useNavigate } from 'react-router-dom';
-import DashBoard from './Dashboard';
 import { Overlay, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 
@@ -51,6 +50,8 @@ export default function Upload()
         e.preventDefault();
         setSubmit(<Spinner animation="border" role="status" size="sm" />);
 
+        // Check to make sure file is tar file
+
         const formData = new FormData();
         formData.append('file', container);
         formData.append('jobName', jobName);
@@ -73,16 +74,9 @@ export default function Upload()
             setUploadResponse(<Alert variant="success" className="mt-3">{data.message}</Alert>);
             setTimeout(() => {
                 setSubmit("Submit");
-                setUploadResponse('');
-                setJobName('');
-                setCpus('');
-                setMemory('');
-                setTime('');
-                setContainer('');
                 handleClose();
             }, 3000);
 
-            DashBoard.loadJobs();
         } 
         else if(response.status === 401) {
             console.error(data.message);
