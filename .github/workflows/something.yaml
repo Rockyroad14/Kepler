@@ -19,13 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('Kepler/frontend_kepler/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+    #   - name: Cache node modules
+    #     uses: actions/cache@v3
+    #     with:
+    #       path: ~/.npm
+    #       key: ${{ runner.os }}-npm-${{ hashFiles('Kepler/frontend_kepler/package-lock.json') }}
+    #       restore-keys: |
+    #         ${{ runner.os }}-npm-
 
       - name: Install dependencies
         run: |
