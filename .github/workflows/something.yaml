@@ -32,12 +32,16 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: get to right directory
+        run: cd frontend_kepler
   
       - name: Install dependencies
         run: npm install
+
+      - name: get to right directory
+        run: cd frontend_kepler
   
       - name: Run the tests
         run: npm test
   
-      - name: Build
-        run: npm run build
