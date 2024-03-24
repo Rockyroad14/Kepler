@@ -320,7 +320,7 @@ app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
         const userId = decoded.userId;
 
         // Check to see if jobName is unique and return an error if it is not
-        const { jobName, cpus, memory, maxTime } = req.body;
+        const { containerName, jobName, cpus, memory, maxTime } = req.body;
 
         const existingJob = await Job.findOne({ jobName });
 
@@ -331,7 +331,7 @@ app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
         console.log(cpus, memory, maxTime, jobName, userId);
 
         // With request body, create a new job and save it to the database and save the container file in the jobs folder with jobName
-        const newJob = new Job({ jobName, author: userId, stateCode: 'staged', cpus, memory, maxTime });
+        const newJob = new Job({ jobName, author: userId, containerName, stateCode: 'staged', cpus, memory, maxTime });
 
         await newJob.save();
 
@@ -416,33 +416,65 @@ app.delete('/api/users', async (req, res) => {
 
 
 // Endpoint to start a SLURM job based on an uploaded container
-app.post('/api/users/submit-job',(req, res) => {
-    // Get the request body
-    const job = req.body;
+app.post('/api/users/submit-job', async (req, res) => {
+    // Check token and get userId
+    const token = req.body.token;
+    const jobId = req.body.jobId;
 
-    // Run the command on a new thread
-    const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpusPerTask,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/job_output/','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',job.container]);
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
 
-    // Listen for stdout data
-    submittedJob.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
+        const job = await Job.findOne({ _id: jobId });
 
-    // Listen for stderr data
-    submittedJob.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
 
-    // Listen for process exit
-    submittedJob.on('exit', (code) => {
-        if (code != 0) {
-            res.status(500).send(`Failed to submit job code ${code}`);
-        } 
-    });
+        if (String(job.author) !== userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // Get the file container and remove the .tar extension from string
+        const container = job.containerName.split('.tar')[0];
+        
+        
+
+
+
+
+
+        // Run the command on a new thread
+        const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',job.container]);
+
+        // Listen for stdout data
+        submittedJob.stdout.on('data', (data) => {
+            console.log(`stdout: ${data}`);
+        });
+
+        // Listen for stderr data
+        submittedJob.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+
+        // Listen for process exit
+        submittedJob.on('exit', (code) => {
+            if (code != 0) {
+                res.status(500).send(`Failed to submit job code ${code}`);
+            } 
+        });
+    } catch (error) {
+
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+
+        res.status(500).send('Failed to submit job');
+    }
 });
 
 // Endpoint to cancel a SLURM job
-app.post('/api/users/stop-job', (req, res) => {
+app.post('/api/users/stop-job', async (req, res) => {
     const jobID = req.body.jobID;
     const token = req.body.token;
     try {
@@ -455,15 +487,17 @@ app.post('/api/users/stop-job', (req, res) => {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
+        const job = await Job.findOne({ _id: jobId });
+
         // Execute SLURM command to stop the job
-        const stopJobProcess =  spawn('sudo', ['scancel', jobID]);
+        const stopJobProcess =  spawn('sudo', ['scancel', job.jobName]);
 
         // Error handling
         stopJobProcess.on('exit', (code) => {
             if (code === 0) {
-                res.status(200).json({ message: `Job ${jobID} stopped successfully` });
+                res.status(200).json({ message: `Job ${job.jobName} stopped successfully` });
             } else {
-                res.status(500).send(`Failed to stop job ${jobID} ${code}`);
+                res.status(500).send(`Failed to stop job ${job.jobName} ${code}`);
             }
         });
 

@@ -34,7 +34,6 @@ export default function Upload()
 
         if (containered && containered.name.endsWith('.tar')) {
             console.log('Valid file type');
-            console.log(containered);
             setContainer(containered);
         } else {
             console.log('Invalid file type. Please upload a .tar file');
@@ -50,10 +49,15 @@ export default function Upload()
         e.preventDefault();
         setSubmit(<Spinner animation="border" role="status" size="sm" />);
 
-        // Check to make sure file is tar file
+        // Grab the fileName from the container object
+        const fileName = container.name;
+        console.log(fileName);
+
+
 
         const formData = new FormData();
         formData.append('file', container);
+        formData.append('containerName', fileName);
         formData.append('jobName', jobName);
         formData.append('cpus', cpus);
         formData.append('memory', memory);
