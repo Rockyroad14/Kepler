@@ -4,6 +4,10 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          node-version: [19.x]
+  
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -16,23 +20,24 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
-      - name: Checkout code
-        uses: actions/checkout@v3
+      
+      
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    #   - name: Cache node modules
-    #     uses: actions/cache@v3
-    #     with:
-    #       path: ~/.npm
-    #       key: ${{ runner.os }}-npm-${{ hashFiles('Kepler/frontend_kepler/package-lock.json') }}
-    #       restore-keys: |
-    #         ${{ runner.os }}-npm-
-
+      - name: get to right directory
+        run: cd frontend_kepler
+  
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+  
       - name: Install dependencies
-        run: |
-          cd Kepler/frontend_kepler/
-          npm install
-
-      - name: Run tests
-        run: |
-          cd Kepler/frontend_kepler/
-          npm test
+        run: npm install
+  
+      - name: Run the tests
+        run: npm test
+  
+      - name: Build
+        run: npm run build
