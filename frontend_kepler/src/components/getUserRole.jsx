@@ -1,5 +1,5 @@
-const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL;
-const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT;
+const apiUrl = import.meta.env.VITE_REACT_APP_BASE_URL
+const apiPort = import.meta.env.VITE_REACT_APP_BASE_PORT
 
 const getUserRole = async () => {
     const token = localStorage.getItem("kepler-token");

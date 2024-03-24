@@ -1,10 +1,9 @@
-# minikube start if port issues
+# minikube start (you don't need to do this every time but this is just for good measure)
+# minikube start
 
 # deletes any old deployment and services first 
 kubectl delete deployment kepler-frontend
 kubectl delete service kepler-frontend
-kubectl delete deployment kepler-backend
-kubectl delete service kepler-backend
 
 kubectl apply -f kubernetes/
 
