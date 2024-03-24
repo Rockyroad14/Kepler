@@ -4,8 +4,6 @@
 # deletes any old deployment and services first 
 kubectl delete deployment kepler-frontend
 kubectl delete service kepler-frontend
-# kubectl delete deployment kepler-backend
-# kubectl delete service kepler-backend
 
 kubectl apply -f kubernetes/
 
