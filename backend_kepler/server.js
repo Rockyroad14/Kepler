@@ -533,14 +533,26 @@ app.post('/check-job', (req, res) => {
 
 // Endpoint to send output data from a SLURM job
 app.post('/job-output', (req, res) => {
-    const jobID = req.body.jobID;
+    const jobId = req.body.jobID;
+    const jobName = req.body.name;
 
+    if (!jobId) 
+        return res.status(400).json({ error: 'Job ID is required' });
+    if (!jobName) 
+        return res.status(400).json({ error: 'Job Name is required' });
 
+    const filePath = path.join(__dirname, 'jobs',`${jobName}`,'output', `${jobId}.txt`);
 
-    // TODO: Once output type is determined this can be setup
-    // Output will most likely be put in jobs folder
-    // Grab the output based on the jobs outputName
-    res.send(`Output data for job ${jobID}`);
+    // Check if the file exists
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+        if (err)
+            return res.status(404).json({ error: 'File not found' });
+
+        // Stream the file to the response
+        const fileStream = fs.createReadStream(filePath);
+        res.setHeader('Content-Type', 'text/plain');
+        fileStream.pipe(res);
+    });
 });
 
 app.use((req, res, next) => {
