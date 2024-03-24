@@ -28,14 +28,6 @@ jobs:
       - name: get to right directory
         run: cd frontend_kepler
   
-      - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: get to right directory
-        run: cd frontend_kepler
-  
       - name: Install dependencies
         run: npm install
 
