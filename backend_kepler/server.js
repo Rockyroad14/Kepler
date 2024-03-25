@@ -436,7 +436,7 @@ app.post('/api/users/submit-job', async (req, res) => {
         const container = job.containerName.split('.tar')[0];
 
         // Run the command on a new thread
-        const submittedJob = spawn('sudo', ['sbatch','-N1','-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',container,job.jobName]);
+        const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',container,job.jobName]);
 
         // Listen for stdout data
         submittedJob.stdout.on('data', (data) => {
@@ -563,7 +563,6 @@ app.post('/check-job', async (req, res) => {
     }
 });
 
-
 app.post('/job-output', async (req, res) => {
     const jobId = req.body.jobId;
     const token = req.body.token;
@@ -583,12 +582,23 @@ app.post('/job-output', async (req, res) => {
         }
 
         // grabbing output file of unknown name
-        const jobPath = path.join(__dirname, 'jobs', job.jobName, 'output');
+        const jobPath = path.join(__dirname, 'jobs', job.jobName);
+        
+        fs.readdir(jobPath, (err, files) => {
+            if (err) {
+                console.error('Error reading directory:', err);
+                return;
+            }
+            const outputFiles = files.filter(file => file.includes('output'));
 
-        const options = {root: jobPath};
+            console.log('Files with "output" in the name:', outputFiles[0]);
+        });
+
+        const fileName = outputFiles[0];
+
         // Send the file to the client
-        res.setHeader('Content-Disposition', 'attachment; filename="test.txt"');
-        res.status(200).sendFile('test.txt',options);
+        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+        res.status(200).sendFile(jobPath+'/'+fileName);
 
     }
     catch (error) {
