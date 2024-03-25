@@ -100,9 +100,10 @@ export default function DashBoard() {
             body: JSON.stringify({ token: token, jobId: id }),
         });
         
-        const blob = response.blob();
+       
 
-        if (response.ok) {
+        if (response.ok) { 
+            const blob = await response.blob();
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement("a");           
             
