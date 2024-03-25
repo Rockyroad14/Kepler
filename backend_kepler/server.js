@@ -565,7 +565,7 @@ app.post('/check-job', async (req, res) => {
 
 
 app.post('/job-output', async (req, res) => {
-    const jobId = req.body.jobID;
+    const jobId = req.body.jobId;
     const token = req.body.token;
 
     try {
@@ -587,7 +587,7 @@ app.post('/job-output', async (req, res) => {
         const files = fs.readdirSync(jobPath);
         // Send the file to the client
 
-        
+        res.status(200).json({ message: 'Job output retrieved', files});
 
     }
     catch (error) {
