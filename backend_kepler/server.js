@@ -328,10 +328,10 @@ app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
             return res.status(400).json({ error: 'Job with this name already exists' });
         }
         // Console print statements for debugging
-        console.log(cpus, memory, maxTime, jobName, userId);
+        console.log(cpus, memory, maxTime, jobName, userId, nodes);
 
         // With request body, create a new job and save it to the database and save the container file in the jobs folder with jobName
-        const newJob = new Job({ jobName, author: userId, containerName, stateCode: 'staged', cpus, nodes, memory, maxTime });
+        const newJob = new Job({ jobName, author: userId, containerName, stateCode: 'staged',slurmCode: '', cpus, nodes, memory, maxTime });
 
         await newJob.save();
 
