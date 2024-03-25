@@ -584,10 +584,11 @@ app.post('/job-output', async (req, res) => {
 
         // grabbing output file of unknown name
         const jobPath = path.join(__dirname, 'jobs', job.jobName, 'output');
-        const files = fs.readdirSync(jobPath);
-        // Send the file to the client
 
-        res.status(200).json({ message: 'Job output retrieved', files});
+        const options = {root: jobPath};
+        // Send the file to the client
+        res.setHeader('Content-Disposition', 'attachment; filename="test.txt"');
+        res.status(200).sendFile('test.txt',options);
 
     }
     catch (error) {

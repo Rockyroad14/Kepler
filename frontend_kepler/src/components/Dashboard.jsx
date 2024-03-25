@@ -99,13 +99,16 @@ export default function DashBoard() {
             },
             body: JSON.stringify({ token: token, jobId: id }),
         });
+        
+        const blob = response.blob();
 
         if (response.ok) {
-            const data = await response.json();
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement("a");           
+            
+            link.href = url;
+            link.download = 'output.txt';
             // download files from the data object
-            const link = document.createElement("a");
-            link.href = data.url;
-            link.download = data.fileName;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
