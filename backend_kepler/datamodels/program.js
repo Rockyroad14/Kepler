@@ -12,6 +12,8 @@ const JobSchema = new mongoose.Schema({
 
     stateCode: { type: String, required: true, },
 
+    slurmCode: { type: String },
+
     cpus: { type: Number, required: true, },
 
     memory: { type: Number, required: true, },

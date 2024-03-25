@@ -511,22 +511,59 @@ app.post('/api/users/stop-job', async (req, res) => {
     }
 });
 
-// Endpoint to check the status of a SLURM job
-app.post('/check-job', (req, res) => {
-    const jobID = req.body.jobID;
+// Endpoint to check the status of users slurm jobs and update the database
+app.post('/check-job', async (req, res) => {
+    const token = req.body.token;
 
-    // Execute SLURM command to check job status
-    const checkJobProcess = spawn('sudo', ['squeue','--job', jobID, '--format=%T']);
+    try {
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
 
-    // Monitor the output and send back the response
-    checkJobProcess.stdout.on('data', (data) => {
-        res.send(`Job ${jobID} status: ${data}`);
-    });
+        // Get all jobs from the database
+        const jobs = await Job.find({ author: userId, stateCode: 'active' });
 
-    // Handle error
-    checkJobProcess.stderr.on('data', (data) => {
-        res.status(500).send(`Error checking job ${jobID} status`);
-    });
+        // Iterate through each job and check the status
+        jobs.forEach(async (job) => {
+            const checkJobProcess = spawn('sudo', ['squeue','--job', job.jobName, '--format=%T']);
+
+            checkJobProcess.stdout.on('data', async (data) => {
+                const status = data.toString().trim();
+                switch (status) {
+                    case 'PD':
+                        job.slurmCode = 'pending';
+                        break;
+                    case 'R':
+                        job.slurmCode = 'running';
+                        break;
+                    case 'CD':
+                        job.slurmCode = 'completed';
+                        job.stateCode = 'completed';
+                        break;
+                    default:
+                        job.slurmCode = 'unknown';
+                        break;
+                }
+
+                await job.save();
+            });
+
+            checkJobProcess.stderr.on('data', (data) => {
+                console.error(`Error checking job ${job.jobName} status`);
+            });
+
+            
+        });
+
+        res.status(200).json({ message: 'Jobs status checked and updated' });
+
+    }
+    catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+        res.status(500).json({ message: 'Error checking and updating job status' });
+    }
 });
 
 
