@@ -16,6 +16,8 @@ const JobSchema = new mongoose.Schema({
 
     cpus: { type: Number, required: true, },
 
+    nodes: { type: Number, required: true, },
+
     memory: { type: Number, required: true, },
 
     maxTime: { type: String, required: true, },

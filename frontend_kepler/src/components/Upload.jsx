@@ -24,6 +24,7 @@ export default function Upload()
     const [container, setContainer] = useState(null);
     const [jobName, setJobName] = useState('');
     const [cpus, setCpus] = useState('');
+    const [Nodes, setNodes] = useState('');
     const [memory, setMemory] = useState('');
     const [time, setTime] = useState('');
     const [submit, setSubmit] = useState("Submit");
@@ -40,6 +41,17 @@ export default function Upload()
             setContainer(null);
             setUploadResponse(<Alert variant="danger" className="mt-3">Invalid file type. Please upload a .tar file</Alert>);
         }
+    }
+
+    const handleResetStates = () => {
+        setSubmit("Submit");
+        setContainer(null);
+        setJobName('');
+        setCpus('');
+        setNodes('');
+        setMemory('');
+        setTime('');
+        setUploadResponse('');
     }
 
 
@@ -60,6 +72,7 @@ export default function Upload()
         formData.append('containerName', fileName);
         formData.append('jobName', jobName);
         formData.append('cpus', cpus);
+        formData.append('nodes', Nodes);
         formData.append('memory', memory);
         formData.append('maxTime', time);
         const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/stagejob`, {
@@ -77,15 +90,15 @@ export default function Upload()
             console.log('Job submitted successfully');
             setUploadResponse(<Alert variant="success" className="mt-3">{data.message}</Alert>);
             setTimeout(() => {
-                setSubmit("Submit");
+                handleResetStates();
                 handleClose();
             }, 3000);
 
         } 
         else if(response.status === 401) {
             console.error(data.message);
-            setSubmit("Submit");
             setUploadResponse(<Alert variant="danger" className="mt-3">{data.message}</Alert>);
+            handleResetStates();
             setTimeout(() => {
                 localStorage.removeItem('kepler-token');
                 navigate('/');
@@ -95,7 +108,7 @@ export default function Upload()
 
         else {
             console.error(response.message);
-            setSubmit("Submit");
+            handleResetStates();
             setUploadResponse(<Alert variant="danger" className="mt-3">{data.message}</Alert>);
         }
 
@@ -144,6 +157,10 @@ export default function Upload()
                     <Form.Group className="mb-3" controlId="formCPU">
                         <Form.Label>Number of CPUs</Form.Label>
                         <Form.Control type="number" placeholder="Enter Number of CPUs" onChange={(e) => {setCpus(e.target.value)}} value={cpus} required min={1} max={numCPUs} />
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="formNodes">
+                        <Form.Label>Number of Nodes</Form.Label>
+                        <Form.Control type="number" placeholder="Enter Number of Nodes" onChange={(e) => {setNodes(e.target.value)}} value={Nodes} required min={1} />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formMemory">
                         <Form.Label>Amount of Memory (MB)</Form.Label>

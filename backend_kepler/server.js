@@ -320,7 +320,7 @@ app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
         const userId = decoded.userId;
 
         // Check to see if jobName is unique and return an error if it is not
-        const { containerName, jobName, cpus, memory, maxTime } = req.body;
+        const { containerName, jobName, cpus, memory, maxTime, nodes } = req.body;
 
         const existingJob = await Job.findOne({ jobName });
 
@@ -331,7 +331,7 @@ app.post('/api/users/stagejob', upload.single('file'), async (req, res) => {
         console.log(cpus, memory, maxTime, jobName, userId);
 
         // With request body, create a new job and save it to the database and save the container file in the jobs folder with jobName
-        const newJob = new Job({ jobName, author: userId, containerName, stateCode: 'staged', cpus, memory, maxTime });
+        const newJob = new Job({ jobName, author: userId, containerName, stateCode: 'staged', cpus, nodes, memory, maxTime });
 
         await newJob.save();
 
