@@ -92,8 +92,28 @@ export default function DashBoard() {
     // Handles the download of a completed job
     const handleDownload = async (id) => {
         const token = localStorage.getItem("kepler-token");
+        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/download`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token: token, jobId: id }),
+        });
 
+        if (response.ok) {
+            const data = await response.json();
+            // download files from the data object
+            const link = document.createElement("a");
+            link.href = data.url;
+            link.download = data.fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
 
+        else {
+            console.log("Download failed", response.status, response.statusText);
+        }
 
     }
 
