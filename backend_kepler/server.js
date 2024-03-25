@@ -439,7 +439,7 @@ app.post('/api/users/submit-job', async (req, res) => {
         const container = job.containerName.split('.tar')[0];
 
         // Run the command on a new thread
-        const submittedJob = spawn('sudo', ['sbatch','-N'+job.nodes,'-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',container]);
+        const submittedJob = spawn('sudo', ['sbatch','-N1','-n'+job.cpus,'--mem-per-cpu='+job.memory+'M','-t'+job.maxTime,'--output=/home/kepler/Kepler/backend_kepler/jobs/'+job.jobName+'/output','--job-name='+job.jobName,'--qos=test','/home/kepler/Kepler/backend_kepler/build_container.sh',container,job.jobName]);
 
         // Listen for stdout data
         submittedJob.stdout.on('data', (data) => {
@@ -489,7 +489,7 @@ app.post('/api/users/stop-job', async (req, res) => {
         const job = await Job.findOne({ _id: jobId });
 
         // Execute SLURM command to stop the job
-        const stopJobProcess =  spawn('sudo', ['scancel', job.jobName]);
+        const stopJobProcess =  spawn('sudo', ['scancel', '-n '+job.jobName]);
 
         // Error handling
         stopJobProcess.on('exit', (code) => {
@@ -525,18 +525,18 @@ app.post('/check-job', async (req, res) => {
 
         // Iterate through each job and check the status
         jobs.forEach(async (job) => {
-            const checkJobProcess = spawn('sudo', ['squeue','--job', job.jobName, '--format=%T']);
+            const checkJobProcess = spawn('sudo', ['squeue','-n ' + job.jobName, '--format=%T']);
 
             checkJobProcess.stdout.on('data', async (data) => {
                 const status = data.toString().trim();
                 switch (status) {
-                    case 'PD':
+                    case 'STATE\nPENDING':
                         job.slurmCode = 'pending';
                         break;
-                    case 'R':
+                    case 'STATE\nRUNNING':
                         job.slurmCode = 'running';
                         break;
-                    case 'CD':
+                    case 'STATE\nCOMPLETED':
                         job.slurmCode = 'completed';
                         job.stateCode = 'completed';
                         break;
@@ -564,31 +564,6 @@ app.post('/check-job', async (req, res) => {
         }
         res.status(500).json({ message: 'Error checking and updating job status' });
     }
-});
-
-
-// Endpoint to send output data from a SLURM job
-app.post('/job-output', (req, res) => {
-    const jobId = req.body.jobID;
-    const jobName = req.body.name;
-
-    if (!jobId) 
-        return res.status(400).json({ error: 'Job ID is required' });
-    if (!jobName) 
-        return res.status(400).json({ error: 'Job Name is required' });
-
-    const filePath = path.join(__dirname, 'jobs',`${jobName}`,'output', `${jobId}.txt`);
-
-    // Check if the file exists
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-        if (err)
-            return res.status(404).json({ error: 'File not found' });
-
-        // Stream the file to the response
-        const fileStream = fs.createReadStream(filePath);
-        res.setHeader('Content-Type', 'text/plain');
-        fileStream.pipe(res);
-    });
 });
 
 
