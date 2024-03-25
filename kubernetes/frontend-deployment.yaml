@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: kepler-frontend-container
-        image: thomas3212/kepler_frontend
+        image: keplercluster/kepler_frontend
         ports:
         - containerPort: 5050
