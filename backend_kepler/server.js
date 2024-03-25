@@ -591,6 +591,41 @@ app.post('/job-output', (req, res) => {
     });
 });
 
+
+app.post('/job-output', async (req, res) => {
+    const jobId = req.body.jobID;
+    const token = req.body.token;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const job = await Job.findOne({ _id: jobId });
+
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        if (String(job.author) !== userId) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+
+        // grabbing output file of unknown name
+        const jobPath = path.join(__dirname, 'jobs', job.jobName, 'output');
+        const files = fs.readdirSync(jobPath);
+        // Send the file to the client
+
+        res.status(200).json({ message: 'Job output retrieved successfully', files });
+
+    }
+    catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).json({ message: 'Token expired' });
+        }
+        res.status(500).json({ message: 'Error getting job output' });
+    }
+});
+
 app.use((req, res, next) => {
     const validPaths = ['/', '/dashboard']; // add your valid paths here
     if (!validPaths.includes(req.path)) {
