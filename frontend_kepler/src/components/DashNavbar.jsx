@@ -49,7 +49,7 @@ export default function DashNavbar() {
         <Container>
           <Navbar.Brand>
             <img src="/icons8-planet-emoji-32.png" className="d-inline-block align top"></img>
-            Kep1er Cluster
+            Kepler Cluster
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse className="justify-content-right" variant="blue">
