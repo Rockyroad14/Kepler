@@ -28,6 +28,25 @@ export default function DashBoard() {
         }
     }
 
+    const updateStatus = async () => {
+        const token = localStorage.getItem("kepler-token");
+        const response = await fetch(`http://${apiUrl}:${apiPort}/check-job`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token: token }),
+        });
+
+        if (response.ok) {
+            console.log("Job status updated");
+        }
+
+        else {
+            console.log("Job status update failed", response.status, response.statusText);
+        }
+    }
+
     // After tokenValidation, load active, staged, and Completed jobs into corresponding tables
     const loadJobQueues = async () => {
         const token = localStorage.getItem("kepler-token");
@@ -103,6 +122,16 @@ export default function DashBoard() {
 
     }
 
+    const getVariant = (slurmCode) => {
+        switch(slurmCode) {
+            case 'PD': return 'info';
+            case 'R': return 'primary';
+            case 'CD': return 'success';
+            case 'F': return 'danger';
+            default: return 'danger';
+        }
+    }
+
     const handleRun = async (id) => {
         const token = localStorage.getItem("kepler-token");
         const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/submit-job`, {
@@ -118,6 +147,7 @@ export default function DashBoard() {
         }
 
     }
+
     // Handles clearing the all of the tables of jobs. Used in the handleRefresh function
     const handleClearQueues = async () => {
         setTableData({ activeJobs: [], stagedJobs: [], completedJobs: [] });
@@ -125,13 +155,20 @@ export default function DashBoard() {
 
     const handleRefresh = async () => {
         handleClearQueues();
-        loadJobQueues();
+        await validateToken();
+        await updateStatus();
+        await loadJobQueues();
     }
 
     // On page load, check for JSON Web Token in local storage with user's credentials, if none, redirect to login page
     useEffect(() => {
-        validateToken()
-        loadJobQueues();
+        handleRefresh();
+
+        const interval = setInterval(() => {
+            handleRefresh();
+        }, 5000);
+
+        return () => clearInterval(interval);
     }, []); 
 
 
@@ -188,7 +225,11 @@ export default function DashBoard() {
                                 tableData.activeJobs.map(job => (
                                 <tr key={job._id}>
                                     <td>{job.jobName}</td>
-                                    <td>{job.stateCode}</td>
+                                    <td>
+                                        <div className="align-items-center">
+                                            <ProgressBar now={100} variant="success" animated className="mt-3" style={{ height: '2rem', width: '100%'}} label={job.stateCode.toUpperCase()} />
+                                        </div>
+                                    </td>
                                     <td>
                                         {job.isAuthor && (
                                             <>
