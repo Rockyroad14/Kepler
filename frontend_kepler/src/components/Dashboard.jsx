@@ -186,7 +186,7 @@ export default function DashBoard() {
 
         const interval = setInterval(() => {
             handleRefresh();
-        }, 5000);
+        }, 30000);
 
         return () => clearInterval(interval);
     }, []); 
