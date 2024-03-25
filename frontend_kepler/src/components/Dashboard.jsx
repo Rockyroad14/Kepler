@@ -92,7 +92,7 @@ export default function DashBoard() {
     // Handles the download of a completed job
     const handleDownload = async (id) => {
         const token = localStorage.getItem("kepler-token");
-        const response = await fetch(`http://${apiUrl}:${apiPort}/api/users/download`, {
+        const response = await fetch(`http://${apiUrl}:${apiPort}/job-output`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
