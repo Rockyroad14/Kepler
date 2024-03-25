@@ -591,14 +591,10 @@ app.post('/job-output', async (req, res) => {
             }
             const outputFiles = files.filter(file => file.includes('output'));
 
-            console.log('Files with "output" in the name:', outputFiles[0]);
+            const full_path = `${jobPath}/${outputFiles[0]}`;
+            console.log(full_path);
+            res.status(200).sendFile(full_path);
         });
-
-        const fileName = outputFiles[0];
-
-        // Send the file to the client
-        res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
-        res.status(200).sendFile(jobPath+'/'+fileName);
 
     }
     catch (error) {
