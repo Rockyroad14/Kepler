@@ -393,7 +393,6 @@ app.post('/api/users/deletejob', async (req, res) => {
     }
 });
     
-
 // Delete user given an email
 app.delete('/api/users', async (req, res) => {
     const userToDelete  = req.body;
@@ -412,8 +411,6 @@ app.delete('/api/users', async (req, res) => {
         res.status(500).json({ error: 'Error deleting user' });
     }
 });
-
-
 
 // Endpoint to start a SLURM job based on an uploaded container
 app.post('/api/users/submit-job', async (req, res) => {
@@ -536,7 +533,7 @@ app.post('/check-job', async (req, res) => {
                     case 'STATE\nRUNNING':
                         job.slurmCode = 'running';
                         break;
-                    case 'STATE\nCOMPLETED':
+                    case 'STATE':
                         job.slurmCode = 'completed';
                         job.stateCode = 'completed';
                         break;
