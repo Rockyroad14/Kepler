@@ -14,4 +14,4 @@ kubectl apply -f kubernetes/
 
 ## used to access the kubernetes pod. how it works is that in the manifests, we mentioned that it runs internally in the pod
 ## on port 5050. So we then tell it to externally expose it on our machine port 5059.
-# kubectl port-forward deployment/kepler-frontend 5059:5050
+# kubectl port-forward deployment/kepler-frontend 5050:5050

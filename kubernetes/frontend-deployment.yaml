@@ -19,3 +19,4 @@ spec:
         image: keplercluster/kepler_frontend
         ports:
         - containerPort: 5050
+        - NodePort: 30050
