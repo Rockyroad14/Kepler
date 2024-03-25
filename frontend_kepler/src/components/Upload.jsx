@@ -116,21 +116,38 @@ export default function Upload()
 
     const handleTimeChange = (e) => {
         let value = e.target.value;
-        value = value.replace(/[^0-9:]/g, ""); // Allow numeric characters and colon
-    
-        // Count the number of colons in the input
+        value = value.replace(/[^0-9:-]/g, ""); // Allow numeric characters, colon, and dash
+
+        // Count the number of colons and dashes in the input
         const colonCount = (value.match(/:/g) || []).length;
-    
-        if (colonCount < 1 && value.length > 2) {
-            // Insert first colon after two digits
-            value = value.slice(0, 2) + ":" + value.slice(2);
+        const dashCount = (value.match(/-/g) || []).length;
+
+        if (dashCount < 1 && value.length > 2) {
+            // Insert dash after two digits
+            value = value.slice(0, 2) + "-" + value.slice(2);
         }
-        if (colonCount < 2 && value.length > 5) {
-            // Insert second colon after five characters
+        if (colonCount < 1 && value.length > 5) {
+            // Insert first colon after five characters
             value = value.slice(0, 5) + ":" + value.slice(5);
         }
-        // Limit length to 8 characters (hh:mm:ss)
-        value = value.slice(0, 8);
+        if (colonCount < 2 && value.length > 8) {
+            // Insert second colon after eight characters
+            value = value.slice(0, 8) + ":" + value.slice(8);
+        }
+        // Limit length to 11 characters (dd-hh:mm:ss)
+        value = value.slice(0, 11);
+
+        // Check if the days are more than 14
+        const days = parseInt(value.split("-")[0]);
+        if (days > 14) {
+            value = "14-00:00:00";
+        } else if (days === 14) {
+            const timeParts = value.split("-");
+            if (timeParts[1] !== "00:00:00") {
+                value = "14-00:00:00";
+            }
+        }
+
         setTime(value);
     };
 
@@ -167,8 +184,8 @@ export default function Upload()
                         <Form.Control type="number" placeholder="Amount of Memory MB" onChange={(e) => {setMemory(e.target.value)}} value={memory} required min={1} />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formTime">
-                        <Form.Label>Time Allotment (hh:mm:ss)</Form.Label>
-                        <Form.Control type="text" placeholder="hh:mm:ss" onChange={handleTimeChange} value={time} required />
+                        <Form.Label>Time Allotment (DD-HH:MM:SS)</Form.Label>
+                        <Form.Control type="text" placeholder="DD-HH:MM:SS" onChange={handleTimeChange} value={time} required />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="formFile">
                         <Form.Label>Upload Container</Form.Label>
